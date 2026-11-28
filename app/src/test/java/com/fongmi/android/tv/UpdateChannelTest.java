@@ -77,7 +77,7 @@ public class UpdateChannelTest {
 
         assertFalse("An existing tag at the same commit should be reusable",
                 resolveStep.contains("Release tag exists::$TAG already exists"));
-        assertTrue("The default tag must remain stable when the same commit is retried",
+        assertFalse("The default tag must not depend on commit timestamp (pure vX.Y.Z)",
                 resolveStep.contains("git show -s --format=%ct \"$GITHUB_SHA\""));
         assertFalse("A retry must not generate a different tag from the current wall clock",
                 resolveStep.contains("$(date +%Y%m%d%H%M)"));
