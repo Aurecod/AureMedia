@@ -39,7 +39,7 @@ public class MusicHomeFragment extends Fragment {
         // 异步加载热榜
         new Thread(() -> {
             try {
-                List<MusicSong> songs = QqMusicApi.playlist(QqMusicApi.HOT_PLAYLISTS[1]); // 热歌榜
+                List<MusicSong> songs = QqMusicApi.playlist(QqMusicApi.HOT_PLAYLISTS[1]); // 热歌榜 (topId=63)
                 if (songs != null && !songs.isEmpty() && getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         List<Object> items = new ArrayList<>();
