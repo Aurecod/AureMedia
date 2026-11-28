@@ -164,8 +164,9 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     /** 当前接口项 = 填充 primary 色 + onPrimary 字（对标 SiteDialogTheme 站源 selected）；非当前 = 原描边样式 */
     private void applyCurrentHighlight(ViewHolder holder, boolean current) {
         android.content.Context ctx = holder.itemView.getContext();
-        int primary = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorPrimary);
-        int onPrimary = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnPrimary);
+        // ★ MaterialColors.getColor(View, int) 两参；colorPrimary 在 appcompat R，colorOnPrimary 在 material R（对标 SiteDialogTheme）
+        int primary = com.google.android.material.color.MaterialColors.getColor(holder.itemView, androidx.appcompat.R.attr.colorPrimary);
+        int onPrimary = com.google.android.material.color.MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnPrimary);
         android.content.res.ColorStateList normalBg = androidx.core.content.ContextCompat.getColorStateList(ctx, R.color.dialog_outlined_button_bg);
         android.content.res.ColorStateList normalText = androidx.core.content.ContextCompat.getColorStateList(ctx, R.color.dialog_outlined_button_text);
         if (current) {
