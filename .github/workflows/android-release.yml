@@ -387,8 +387,8 @@ jobs:
         run: |
           set -euo pipefail
           apk_count="$(find dist -maxdepth 1 -name '*.apk' | wc -l)"
-          if [ "$apk_count" -ne 4 ]; then
-            echo "::error title=Missing release APKs::Expected 4 APKs, found $apk_count."
+          if [ "$apk_count" -ne 1 ]; then
+            echo "::error title=Missing release APKs::Expected 1 APK, found $apk_count."
             find dist -maxdepth 1 -name '*.apk' -printf '%f\n' || true
             exit 1
           fi
