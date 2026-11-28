@@ -355,7 +355,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             int w = sideNavWidth;
             int h = screenH / 2;
             int left = sideNavFromLeft ? 0 : screenW - w; // 面板按方向靠左/靠右
-            int top = ResUtil.dp2px(60); // 面板距顶 60dp（与布局 marginTop 一致）
+            int top = ResUtil.dp2px(90); // 面板距顶 90dp（与布局 marginTop 一致）
             android.graphics.Bitmap src = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
             android.graphics.Canvas canvas = new android.graphics.Canvas(src);
             canvas.translate(-left, -top);

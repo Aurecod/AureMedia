@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="90dp"
         android:background="@drawable/bg_side_nav"
         android:orientation="vertical"
         android:paddingTop="20dp"
@@ -89,44 +89,44 @@
                 <TextView
                     android:id="@+id/sideVod"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="64dp"
                     android:layout_marginBottom="6dp"
                     android:background="@drawable/bg_side_nav_item"
                     android:elevation="3dp"
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="视频（点播）"
+                    android:text="视频"
                     android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/sideMusic"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="64dp"
                     android:layout_marginBottom="6dp"
                     android:background="@drawable/bg_side_nav_item"
                     android:elevation="3dp"
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="音乐（待开发）"
+                    android:text="音乐"
                     android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/sideRead"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="64dp"
                     android:layout_marginBottom="6dp"
                     android:background="@drawable/bg_side_nav_item"
                     android:elevation="3dp"
                     android:gravity="center"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="阅读（待开发）"
+                    android:text="阅读"
                     android:textColor="@color/white"
-                    android:textSize="12sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
