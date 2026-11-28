@@ -345,10 +345,10 @@ public class MusicEngine {
             return list;
         }
         static List<MusicSong> hot() throws Exception {
-            String url = BASE + "/api/playlist/detail?id=3778678"; // 热歌榜
+            String url = BASE + "/api/v6/playlist/detail?id=3778678"; // 热歌榜(v6 有 tracks)
             JSONObject obj = new JSONObject(OkHttp.string(url, headers()));
-            JSONObject result = obj.optJSONObject("result");
-            JSONArray tracks = result != null ? result.optJSONArray("tracks") : null;
+            JSONObject playlist = obj.optJSONObject("playlist");
+            JSONArray tracks = playlist != null ? playlist.optJSONArray("tracks") : null;
             List<MusicSong> list = new ArrayList<>();
             if (tracks != null) {
                 for (int i = 0; i < tracks.length(); i++) {
@@ -426,9 +426,8 @@ public class MusicEngine {
             List<MusicPlaylist> list = new ArrayList<>();
             for (int id : ids) {
                 try {
-                    JSONObject obj = new JSONObject(OkHttp.string(BASE + "/api/playlist/detail?id=" + id, headers()));
-                    JSONObject result = obj.optJSONObject("result");
-                    JSONObject pl = result != null ? result.optJSONObject("playlist") : null;
+                    JSONObject obj = new JSONObject(OkHttp.string(BASE + "/api/v6/playlist/detail?id=" + id, headers()));
+                    JSONObject pl = obj.optJSONObject("playlist");
                     MusicPlaylist p = parsePlaylist(pl);
                     if (p != null) list.add(p);
                 } catch (Exception e) { }
@@ -489,14 +488,13 @@ public class MusicEngine {
             return result;
         }
         static List<MusicSong> hot() throws Exception {
-            // QQ 热歌榜 topId=63（TopList）
-            String json = "{\"req_1\":{\"module\":\"musicToplist.ToplistInfoServer\",\"method\":\"GetDetail\",\"param\":{\"topId\":63}}}";
+            // QQ 热歌榜 topId=26（GetDetail 返回 songInfoList）
+            String json = "{\"comm\":{\"ct\":24},\"req_1\":{\"module\":\"musicToplist.ToplistInfoServer\",\"method\":\"GetDetail\",\"param\":{\"topId\":26,\"offset\":0,\"num\":30,\"withRes\":1}}}";
             String url = BASE + "/cgi-bin/musicu.fcg?data=" + URLEncoder.encode(json, "UTF-8");
             JSONObject obj = new JSONObject(OkHttp.string(url, qqHeaders()));
             JSONObject data = obj.optJSONObject("req_1");
             JSONObject body = data != null ? data.optJSONObject("data") : null;
-            JSONObject songList = body != null ? body.optJSONObject("songList") : null;
-            JSONArray list = songList != null ? songList.optJSONArray("songList") : null;
+            JSONArray list = body != null ? body.optJSONArray("songInfoList") : null;
             List<MusicSong> result = new ArrayList<>();
             if (list != null) {
                 for (int i = 0; i < list.length(); i++) {

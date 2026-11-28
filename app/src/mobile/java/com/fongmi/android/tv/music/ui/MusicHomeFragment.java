@@ -150,6 +150,15 @@ public class MusicHomeFragment extends Fragment {
         cover.setBackground(rounded(0xFF2A2E37, 10));
         if (p.cover != null && !p.cover.isEmpty()) {
             Glide.with(this).load(p.cover).into(cover);
+        } else {
+            // 无封面：方块内显示名称首字/序号（避免纯色方块）
+            TextView ph = new TextView(getContext());
+            ph.setText(p.name.length() > 0 ? p.name.substring(0, Math.min(2, p.name.length())) : "♪");
+            ph.setTextSize(20);
+            ph.setTextColor(0xFF8A8F99);
+            ph.setGravity(Gravity.CENTER);
+            cover.addView(ph, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         }
         card.addView(cover);
         TextView name = new TextView(getContext());
