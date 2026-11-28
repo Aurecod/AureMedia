@@ -59,6 +59,7 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.MobileWindow;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PermissionUtil;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.fongmi.android.tv.web.WebHomeChromeStartup;
@@ -83,6 +84,8 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     private boolean wideWindow;
     private int currentPosition;
     private boolean returnVodFromEnhance;
+    private boolean sideNavVisible;
+    private int sideNavWidth;
 
     @Override
     protected ViewBinding getBinding() {
@@ -118,6 +121,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         initFragment(savedInstanceState);
         if (savedInstanceState == null && getIntent().hasExtra(EXTRA_NAV_POSITION)) checkAction(getIntent());
         initConfig();
+        initSideNav();
     }
 
     @Override
@@ -290,6 +294,82 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         }
         mBinding.container.setLayoutParams(params);
         mBinding.getRoot().requestApplyInsets();
+    }
+
+    // ★ 侧边版块导航（视频/音乐/阅读）：默认隐藏，侧滑返回一次弹出，再次返回退出。
+    private void initSideNav() {
+        mBinding.sideNavOverlay.setOnClickListener(v -> hideSideNav());
+        mBinding.sideVod.setOnClickListener(v -> onSideSection(0));
+        mBinding.sideMusic.setOnClickListener(v -> onSideSection(1));
+        mBinding.sideRead.setOnClickListener(v -> onSideSection(2));
+    }
+
+    private void onSideSection(int section) {
+        if (section == 0) {
+            // 视频（点播）= 当前 App 主页
+            if (currentPosition != 0) change(0);
+        } else {
+            // 音乐/阅读 待开发
+            Notify.show(section == 1 ? "「音乐」版块待开发" : "「阅读」版块待开发");
+        }
+        hideSideNav();
+    }
+
+    private void showSideNav() {
+        if (sideNavVisible) return;
+        sideNavVisible = true;
+        // 宽 = 屏宽 1/4，高 = 屏高 1/2
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBinding.sideNav.getLayoutParams();
+        lp.width = ResUtil.getScreenWidth(this) / 4;
+        lp.height = ResUtil.getScreenHeight(this) / 2;
+        mBinding.sideNav.setLayoutParams(lp);
+        sideNavWidth = lp.width;
+        mBinding.sideNavOverlay.setVisibility(View.VISIBLE);
+        mBinding.sideNav.setVisibility(View.VISIBLE);
+        applyFrostedGlass();
+        mBinding.sideNav.setTranslationX(sideNavWidth);
+        mBinding.sideNav.animate().translationX(0).setDuration(220).start();
+    }
+
+    /**
+     * 磨砂透明底：截取面板区域的容器画面 → 降采样模糊（跨版本稳定，无需 RenderEffect）→
+     * 圆角裁剪 → 叠加半透明深色。失败兜底为半透明深色+圆角。
+     */
+    private void applyFrostedGlass() {
+        try {
+            int screenW = ResUtil.getScreenWidth(this);
+            int screenH = ResUtil.getScreenHeight(this);
+            int w = sideNavWidth;
+            int h = screenH / 2;
+            int left = screenW - w;
+            int top = 0; // 面板顶部对齐（不垂直居中）
+            android.graphics.Bitmap src = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas canvas = new android.graphics.Canvas(src);
+            canvas.translate(-left, -top);
+            mBinding.container.draw(canvas);
+            // 降采样模糊（磨砂核心）
+            android.graphics.Bitmap small = android.graphics.Bitmap.createScaledBitmap(src, Math.max(1, w / 8), Math.max(1, h / 8), true);
+            android.graphics.Bitmap blur = android.graphics.Bitmap.createScaledBitmap(small, w, h, true);
+            android.graphics.Bitmap result = blur.copy(android.graphics.Bitmap.Config.ARGB_8888, true);
+            // 叠加半透明深色（磨砂透明底）
+            android.graphics.Canvas c2 = new android.graphics.Canvas(result);
+            c2.drawColor(0xB312141A);
+            androidx.core.graphics.drawable.RoundedBitmapDrawable rbd = androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(getResources(), result);
+            rbd.setCornerRadius(ResUtil.dp2px(20));
+            rbd.setAntiAlias(true);
+            mBinding.sideNav.setBackground(rbd);
+        } catch (Throwable t) {
+            mBinding.sideNav.setBackgroundResource(R.drawable.bg_side_nav);
+        }
+    }
+
+    private void hideSideNav() {
+        if (!sideNavVisible) return;
+        sideNavVisible = false;
+        mBinding.sideNav.animate().translationX(sideNavWidth).setDuration(200).withEndAction(() -> {
+            mBinding.sideNav.setVisibility(View.GONE);
+            mBinding.sideNavOverlay.setVisibility(View.GONE);
+        }).start();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -519,8 +599,14 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         } else if (mManager.isVisible(1)) {
             change(0);
         } else if (mManager.canBack(0)) {
-            if (PlaybackService.isRunning()) Util.moveToBackground(this);
-            else super.onBackInvoked();
+            // ★ 侧边版块导航：第一次返回弹出，再次返回退出（播放中则后台）
+            if (!sideNavVisible) {
+                showSideNav();
+            } else if (PlaybackService.isRunning()) {
+                Util.moveToBackground(this);
+            } else {
+                super.onBackInvoked();
+            }
         }
     }
 
