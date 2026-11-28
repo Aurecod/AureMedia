@@ -53,6 +53,12 @@ public class MusicActivity extends BaseActivity {
 
         applyTheme();
         applyFullscreen();
+        // 状态栏避让：edge-to-edge 下根布局加状态栏高度 padding（平台切换按钮不再顶到状态栏）
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
+            androidx.core.graphics.Insets sb = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars());
+            v.setPadding(0, sb.top, 0, sb.bottom);
+            return insets;
+        });
         switchTab(0);
     }
 
@@ -74,11 +80,16 @@ public class MusicActivity extends BaseActivity {
         int text = dark ? 0xFFFFFFFF : 0xFF12141A;
         int sub = dark ? 0xFF8A8F99 : 0xFF606770;
         mBinding.getRoot().setBackgroundColor(bg);
-        // 底部 tab 背景 + 文字
+        // 底部 tab 容器背景 + 文字
+        View bottomBar = mBinding.getRoot().findViewById(R.id.musicBottomBar);
+        if (bottomBar != null) bottomBar.setBackgroundColor(dark ? 0xFF1A1D26 : 0xFFE4E6EA);
         mBinding.musicTabHome.setTextColor(text);
         mBinding.musicTabLib.setTextColor(sub);
         mBinding.musicTabSearch.setTextColor(sub);
         mBinding.musicTabSetting.setTextColor(sub);
+        // 迷你条背景
+        View mini = mBinding.getRoot().findViewById(R.id.musicMini);
+        if (mini != null) mini.setBackgroundColor(dark ? 0xFF1F232C : 0xFFE4E6EA);
     }
 
     /** 更新迷你播放条 */
@@ -115,8 +126,10 @@ public class MusicActivity extends BaseActivity {
                 .replace(R.id.musicContent, fragment)
                 .commit();
 
-        // 高亮当前 tab
-        int on = 0xFFFFFFFF, off = 0xFF8A8F99;
+        // 高亮当前 tab（按主题色）
+        boolean dark = MusicEngine.isDarkTheme(this);
+        int on = dark ? 0xFFFFFFFF : 0xFF12141A;
+        int off = dark ? 0xFF8A8F99 : 0xFF606770;
         mBinding.musicTabHome.setTextColor(index == 0 ? on : off);
         mBinding.musicTabLib.setTextColor(index == 1 ? on : off);
         mBinding.musicTabSearch.setTextColor(index == 2 ? on : off);

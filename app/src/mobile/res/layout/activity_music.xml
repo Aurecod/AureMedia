@@ -68,6 +68,7 @@
 
     <!-- 底部 4 tab 导航 -->
     <LinearLayout
+        android:id="@+id/musicBottomBar"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:orientation="horizontal"

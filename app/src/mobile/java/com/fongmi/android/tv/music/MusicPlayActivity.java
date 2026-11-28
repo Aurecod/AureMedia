@@ -46,6 +46,12 @@ public class MusicPlayActivity extends BaseActivity {
         super.onCreate(savedInstanceState); // BaseActivity 状态栏 edge-to-edge
 
         applyPlayStyle();
+        // 状态栏避让
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
+            androidx.core.graphics.Insets sb = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars());
+            v.setPadding(0, sb.top, 0, sb.bottom);
+            return insets;
+        });
         mBinding.npClose.setOnClickListener(v -> finish());        mBinding.npPlay.setOnClickListener(v -> {
             MusicPlayer.get().togglePlay();
             updatePlayBtn();
