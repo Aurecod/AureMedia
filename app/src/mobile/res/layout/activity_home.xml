@@ -31,99 +31,156 @@
         android:focusable="true"
         android:visibility="gone" />
 
-    <!-- ★ 侧边版块导航栏（视频/音乐/阅读）：默认隐藏，侧滑返回一次弹出，再次返回退出 -->
+    <!-- ★ 侧边版块导航栏（视频/音乐/阅读）：距顶 60dp，右侧顶部对齐，默认隐藏 -->
     <LinearLayout
         android:id="@+id/sideNav"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="60dp"
         android:background="@drawable/bg_side_nav"
         android:orientation="vertical"
-        android:paddingTop="28dp"
-        android:paddingBottom="24dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         android:visibility="gone">
 
-        <!-- ★ 顶部：应用图标 + 名字 -->
-        <LinearLayout
+        <!-- ★ 应用图标：镂空无底色，慢速向右旋转（动画在 Java 里挂） -->
+        <ImageView
+            android:id="@+id/sideAppIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_launcher_fg" />
+
+        <!-- ★ 应用名：根据宽度自动调整大小 -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/sideAppName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="20dp">
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:autoSizeMaxTextSize="18sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeTextType="uniform" />
 
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@mipmap/ic_launcher" />
+        <!-- ★ 版块按钮：纵向可滚动 -->
+        <ScrollView
+            android:id="@+id/sideScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="@string/app_name"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="16dp"
-            android:text="版块"
-            android:textColor="#80FFFFFF"
-            android:textSize="13sp" />
+                <LinearLayout
+                    android:id="@+id/sideVod"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/bg_side_nav_item"
+                    android:elevation="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
 
-        <TextView
-            android:id="@+id/sideVod"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="6dp"
-            android:background="@drawable/bg_side_nav_item"
-            android:gravity="center_vertical"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:text="视频（点播）"
-            android:textColor="@color/white"
-            android:textSize="13sp" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_nav_vod"
+                        app:tint="@color/white" />
 
-        <TextView
-            android:id="@+id/sideMusic"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginBottom="6dp"
-            android:background="@drawable/bg_side_nav_item"
-            android:gravity="center_vertical"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:text="音乐（待开发）"
-            android:textColor="@color/white"
-            android:textSize="13sp" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:text="视频（点播）"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
-        <TextView
-            android:id="@+id/sideRead"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_side_nav_item"
-            android:gravity="center_vertical"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:text="阅读（待开发）"
-            android:textColor="@color/white"
-            android:textSize="13sp" />
+                <LinearLayout
+                    android:id="@+id/sideMusic"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/bg_side_nav_item"
+                    android:elevation="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_nav_lab"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:text="音乐（待开发）"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/sideRead"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_side_nav_item"
+                    android:elevation="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_nav_lab"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:text="阅读（待开发）"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 

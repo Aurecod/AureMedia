@@ -302,6 +302,15 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         mBinding.sideVod.setOnClickListener(v -> onSideSection(0));
         mBinding.sideMusic.setOnClickListener(v -> onSideSection(1));
         mBinding.sideRead.setOnClickListener(v -> onSideSection(2));
+        // ★ 应用图标：镂空无底色，慢速向右（顺时针）旋转
+        android.view.animation.RotateAnimation rotate = new android.view.animation.RotateAnimation(
+                0, 360,
+                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f,
+                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate.setDuration(8000);
+        rotate.setRepeatCount(android.view.animation.Animation.INFINITE);
+        rotate.setRepeatMode(android.view.animation.Animation.RESTART);
+        mBinding.sideAppIcon.startAnimation(rotate);
     }
 
     private void onSideSection(int section) {
@@ -318,9 +327,9 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     private void showSideNav() {
         if (sideNavVisible) return;
         sideNavVisible = true;
-        // 宽 = 屏宽 1/4，高 = 屏高 1/2
+        // 宽 = 屏宽 1/4 + 20dp，高 = 屏高 1/2，距顶 60dp（布局已设）
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mBinding.sideNav.getLayoutParams();
-        lp.width = ResUtil.getScreenWidth(this) / 4;
+        lp.width = ResUtil.getScreenWidth(this) / 4 + ResUtil.dp2px(20);
         lp.height = ResUtil.getScreenHeight(this) / 2;
         mBinding.sideNav.setLayoutParams(lp);
         sideNavWidth = lp.width;
@@ -342,7 +351,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             int w = sideNavWidth;
             int h = screenH / 2;
             int left = screenW - w;
-            int top = 0; // 面板顶部对齐（不垂直居中）
+            int top = ResUtil.dp2px(60); // 面板距顶 60dp（与布局 marginTop 一致）
             android.graphics.Bitmap src = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
             android.graphics.Canvas canvas = new android.graphics.Canvas(src);
             canvas.translate(-left, -top);
