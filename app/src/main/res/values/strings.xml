@@ -1,7 +1,7 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
-   <string name="app_name">AureMedia</string>
+   <string name="app_name">𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪</string>
    <string name="setting_app_branding">App icon</string>
     <string name="app_branding_icon_current">Default icon</string>
     <string name="app_branding_icon_history">Original icon</string>
@@ -329,7 +329,7 @@
     <string name="remote_trust_clear_message">Clear all remote trust profiles, device tokens, groups, and pending binding codes on this device?</string>
     <string name="remote_trust_no_bind_code">No binding code</string>
     <string name="remote_trust_dialog_hint">Enter your relay server URL, then save/register this device. Create a binding code when adding this device to a controller.</string>
-    <string name="remote_trust_bind_code_hint">Tap the code to copy it. It is valid for a short time and can be used by the Web console or another AureMedia device.</string>
+    <string name="remote_trust_bind_code_hint">Tap the code to copy it. It is valid for a short time and can be used by the Web console or another 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 device.</string>
     <string name="remote_trust_file_permission_hint">File permission is recommended so trust data can be restored after reinstall.</string>
     <string name="remote_trust_server_required">Enter a valid relay server URL</string>
     <string name="remote_trust_register_done">Remote trust registered</string>
@@ -342,9 +342,9 @@
     <string name="remote_trust_current_status_summary">%1$s · Groups %2$d · Devices %3$d</string>
     <string name="remote_trust_notification_title">Remote trust online</string>
     <string name="remote_trust_section_local">This device</string>
-    <string name="remote_trust_section_local_hint">Register this AureMedia device with the relay. Generate a code when another device needs to manage it.</string>
+    <string name="remote_trust_section_local_hint">Register this 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 device with the relay. Generate a code when another device needs to manage it.</string>
     <string name="remote_trust_section_manage">Manage devices</string>
-    <string name="remote_trust_section_manage_hint">Enter the binding code shown on another AureMedia device, then manage it from here.</string>
+    <string name="remote_trust_section_manage_hint">Enter the binding code shown on another 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 device, then manage it from here.</string>
     <string name="remote_trust_bind_code">Binding code</string>
     <string name="remote_trust_device_alias">Device alias</string>
     <string name="remote_trust_add_device">Add device</string>
@@ -1110,10 +1110,10 @@
     <string name="setting_on">On</string>
 
     <!-- About -->
-    <string name="about_title">About AureMedia</string>
+    <string name="about_title">About 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪</string>
     <string name="about_free_badge">Free</string>
     <string name="about_version">Version %1$s · %2$s/%3$s</string>
-    <string name="about_disclaimer">AureMedia is a technical learning and research project based on open source ecosystems. The software itself is completely free and does not provide paid services, video content, live sources, API sources, resource storage, or content distribution.\n\nThis software is only for technical learning, research, and personal testing. Please uninstall it within 24 hours after downloading, installing, or trying it. All behavior and consequences arising from continued use are borne by the user.\n\nThis software does not embed, sell, or distribute any video resources, and is not responsible for interfaces, sources, plugins, scripts, links, cloud-drive resources, or third-party service content added by users. Users must comply with local laws and regulations, respect the rights of copyright owners and content providers, and must not use this software for infringement, piracy, illegal content distribution, or other illegal purposes.\n\nAny individual or organization is strictly prohibited from selling, traffic diversion, paid maintenance, membership services, advertising monetization, box preinstallation, TV box bundle sales, or any other form of profit-making in the name of this software. The project clearly opposes and condemns selling or promoting this software as part of TV boxes, set-top boxes, paid packages, or commercial services.\n\nIf you do not agree with this statement, please stop using and uninstall this software immediately.</string>
+    <string name="about_disclaimer">𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 is a technical learning and research project based on open source ecosystems. The software itself is completely free and does not provide paid services, video content, live sources, API sources, resource storage, or content distribution.\n\nThis software is only for technical learning, research, and personal testing. Please uninstall it within 24 hours after downloading, installing, or trying it. All behavior and consequences arising from continued use are borne by the user.\n\nThis software does not embed, sell, or distribute any video resources, and is not responsible for interfaces, sources, plugins, scripts, links, cloud-drive resources, or third-party service content added by users. Users must comply with local laws and regulations, respect the rights of copyright owners and content providers, and must not use this software for infringement, piracy, illegal content distribution, or other illegal purposes.\n\nAny individual or organization is strictly prohibited from selling, traffic diversion, paid maintenance, membership services, advertising monetization, box preinstallation, TV box bundle sales, or any other form of profit-making in the name of this software. The project clearly opposes and condemns selling or promoting this software as part of TV boxes, set-top boxes, paid packages, or commercial services.\n\nIf you do not agree with this statement, please stop using and uninstall this software immediately.</string>
     <string name="about_check_update">Check updates</string>
     <string name="about_acknowledge">I understand</string>
     <string name="setting_github_proxy">GitHub acceleration sources</string>
@@ -1171,7 +1171,7 @@
     <string name="sync_device_mobile">Phone</string>
     <string name="sync_device_tv">TV</string>
     <string name="sync_discovering">Discovering devices...</string>
-    <string name="sync_no_device">No device found. Keep both devices on the same LAN with AureMedia open, then refresh.</string>
+    <string name="sync_no_device">No device found. Keep both devices on the same LAN with 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 open, then refresh.</string>
     <string name="sync_selected">Selected: %1$s · %2$s</string>
     <string name="sync_start">Start sync</string>
     <string name="sync_cancel">Cancel sync</string>

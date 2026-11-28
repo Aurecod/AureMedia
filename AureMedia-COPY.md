@@ -1,8 +1,8 @@
-# AureMedia
+# 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪
 
 > 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 —— 简洁、流畅、可定制的影音播放器
 
-AureMedia 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次开发的 Android 影音应用，
+𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次开发的 Android 影音应用，
 保留原有点播、直播、Spider、解析、投屏、本地 HTTP 服务等能力，并重点增强了
 **WebHome 自定义首页**、**App Native SDK**、**管理页面**、**远程托管**、**WebHome 扩展**、
 **登录态学习/同步**、**网盘链接检测**、**站点健康排序**、**观影记录同步** 和 **Nostr/TMDB 推荐首页**。
@@ -45,13 +45,13 @@ AureMedia 是基于 [FongMi](https://github.com/FongMi/TV) / CatVod 生态二次
 
 - **版本**：1.0.0（versionCode 10000，百进制：第三段 0–99 进位第二段）
 - **包名**：com.auremedia.app
-- **签名**：AureMedia 专属（O=AureMedia, CN=AureMedia Debug）
+- **签名**：𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 专属（O=𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪, CN=𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 Debug）
 
 ---
 
 ## ✦ 免责声明
 
-AureMedia 是基于开源生态二次开发的技术学习与研究项目，软件本体完全免费，不提供任何付费服务、
+𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 是基于开源生态二次开发的技术学习与研究项目，软件本体完全免费，不提供任何付费服务、
 影视内容、直播源、接口源、资源存储或内容分发能力。
 
 本软件仅供技术学习、研究和个人测试使用，请在下载、安装或试用后 24 小时内自行卸载。

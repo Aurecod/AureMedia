@@ -1,7 +1,7 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
-    <string name="app_name">AureMedia</string>
+    <string name="app_name">𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪</string>
    <string name="setting_app_branding">APP 圖示</string>
     <string name="app_branding_icon_current">預設圖示</string>
     <string name="app_branding_icon_history">原始圖示</string>
@@ -296,7 +296,7 @@
     <string name="remote_trust_clear_message">清空本機所有遠程託管服務、設備令牌、設備組和待綁定碼？</string>
     <string name="remote_trust_no_bind_code">暫無綁定碼</string>
     <string name="remote_trust_dialog_hint">填寫中轉服務 URL 後儲存/註冊本機。需要把本機加入控制端時，再產生綁定碼。</string>
-    <string name="remote_trust_bind_code_hint">點擊綁定碼可複製。綁定碼短時間有效，可在 Web 控制台或另一台 AureMedia 裡使用。</string>
+    <string name="remote_trust_bind_code_hint">點擊綁定碼可複製。綁定碼短時間有效，可在 Web 控制台或另一台 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 裡使用。</string>
     <string name="remote_trust_file_permission_hint">建議授予檔案權限，卸載重裝後也能恢復託管關係。</string>
     <string name="remote_trust_server_required">請輸入有效的中轉服務 URL</string>
     <string name="remote_trust_register_done">遠程託管已註冊</string>
@@ -309,9 +309,9 @@
     <string name="remote_trust_current_status_summary">%1$s · 組 %2$d · 設備 %3$d</string>
     <string name="remote_trust_notification_title">遠程託管在線</string>
     <string name="remote_trust_section_local">本機接入</string>
-    <string name="remote_trust_section_local_hint">把目前 AureMedia 註冊到中轉服務。需要讓其他設備管理本機時，在這裡產生綁定碼。</string>
+    <string name="remote_trust_section_local_hint">把目前 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 註冊到中轉服務。需要讓其他設備管理本機時，在這裡產生綁定碼。</string>
     <string name="remote_trust_section_manage">管理設備</string>
-    <string name="remote_trust_section_manage_hint">輸入另一台 AureMedia 顯示的綁定碼，把它加入本機管理列表後即可下發基礎操作。</string>
+    <string name="remote_trust_section_manage_hint">輸入另一台 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 顯示的綁定碼，把它加入本機管理列表後即可下發基礎操作。</string>
     <string name="remote_trust_bind_code">綁定碼</string>
     <string name="remote_trust_device_alias">設備備註</string>
     <string name="remote_trust_add_device">加入設備</string>
@@ -1060,10 +1060,10 @@
     <string name="setting_on">開</string>
 
     <!-- About -->
-    <string name="about_title">關於 AureMedia</string>
+    <string name="about_title">關於 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪</string>
     <string name="about_free_badge">完全免費</string>
     <string name="about_version">版本 %1$s · %2$s/%3$s</string>
-    <string name="about_disclaimer">AureMedia 是基於開源生態二次開發的技術學習與研究項目，軟體本體完全免費，不提供任何付費服務、影視內容、直播源、接口源、資源儲存或內容分發能力。\n\n本軟體僅供技術學習、研究和個人測試使用，請在下載、安裝或試用後 24 小時內自行解除安裝。繼續使用本軟體所產生的一切行為及後果，由使用者自行承擔。\n\n本軟體不內置、不售賣、不傳播任何影視資源，不對使用者自行添加的接口、站源、插件、腳本、連結、網盤資源或第三方服務內容負責。使用者應遵守所在地法律法規，尊重版權方和內容提供方的合法權益，不得將本軟體用於任何侵權、盜版、傳播非法內容或其他違法違規用途。\n\n嚴禁任何個人或組織以本軟體名義進行售賣、引流、收費維護、會員服務、廣告變現、盒子預裝、電視盒子捆綁銷售或其他任何形式的獲益行為。對於將本軟體內置於電視盒子、機頂盒、付費套餐或商業服務中進行銷售、推廣的行為，項目方明確反對並予以譴責。\n\n如你不同意以上聲明，請立即停止使用並解除安裝本軟體。</string>
+    <string name="about_disclaimer">𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪 是基於開源生態二次開發的技術學習與研究項目，軟體本體完全免費，不提供任何付費服務、影視內容、直播源、接口源、資源儲存或內容分發能力。\n\n本軟體僅供技術學習、研究和個人測試使用，請在下載、安裝或試用後 24 小時內自行解除安裝。繼續使用本軟體所產生的一切行為及後果，由使用者自行承擔。\n\n本軟體不內置、不售賣、不傳播任何影視資源，不對使用者自行添加的接口、站源、插件、腳本、連結、網盤資源或第三方服務內容負責。使用者應遵守所在地法律法規，尊重版權方和內容提供方的合法權益，不得將本軟體用於任何侵權、盜版、傳播非法內容或其他違法違規用途。\n\n嚴禁任何個人或組織以本軟體名義進行售賣、引流、收費維護、會員服務、廣告變現、盒子預裝、電視盒子捆綁銷售或其他任何形式的獲益行為。對於將本軟體內置於電視盒子、機頂盒、付費套餐或商業服務中進行銷售、推廣的行為，項目方明確反對並予以譴責。\n\n如你不同意以上聲明，請立即停止使用並解除安裝本軟體。</string>
     <string name="about_check_update">檢查更新</string>
     <string name="about_acknowledge">我已知悉</string>
     <string name="setting_github_proxy">GitHub 加速源</string>
@@ -1175,7 +1175,7 @@
     <string name="sync_device_mobile">手機</string>
     <string name="sync_device_tv">電視</string>
     <string name="sync_discovering">正在發現設備...</string>
-    <string name="sync_no_device">未發現設備，請確認兩台設備在同一局域網並已打開 AureMedia，然後刷新。</string>
+    <string name="sync_no_device">未發現設備，請確認兩台設備在同一局域網並已打開 𝓐𝓾𝓻𝓮𝓜𝓮𝓭𝓲𝓪，然後刷新。</string>
     <string name="sync_selected">已選擇：%1$s · %2$s</string>
     <string name="sync_start">開始同步</string>
     <string name="sync_cancel">取消同步</string>
