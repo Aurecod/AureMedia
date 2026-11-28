@@ -86,6 +86,10 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     private boolean returnVodFromEnhance;
     private boolean sideNavVisible;
     private int sideNavWidth;
+    private boolean sideNavFromLeft = true; // 侧栏从哪边弹出（由边缘手势方向决定）
+    private float mSideDownX = -1;
+    private float mSideDownY = -1;
+    private int mSideEdge = 0; // -1 左边缘, 0 无, 1 右边缘
 
     @Override
     protected ViewBinding getBinding() {
@@ -336,7 +340,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         mBinding.sideNavOverlay.setVisibility(View.VISIBLE);
         mBinding.sideNav.setVisibility(View.VISIBLE);
         applyFrostedGlass();
-        mBinding.sideNav.setTranslationX(-sideNavWidth); // 靠左：从左边滑入
+        mBinding.sideNav.setTranslationX(sideNavFromLeft ? -sideNavWidth : sideNavWidth); // 从对应侧滑入
         mBinding.sideNav.animate().translationX(0).setDuration(220).start();
     }
 
@@ -350,7 +354,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             int screenH = ResUtil.getScreenHeight(this);
             int w = sideNavWidth;
             int h = screenH / 2;
-            int left = 0; // 靠左：面板在屏幕左侧
+            int left = sideNavFromLeft ? 0 : screenW - w; // 面板按方向靠左/靠右
             int top = ResUtil.dp2px(60); // 面板距顶 60dp（与布局 marginTop 一致）
             android.graphics.Bitmap src = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
             android.graphics.Canvas canvas = new android.graphics.Canvas(src);
@@ -375,7 +379,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     private void hideSideNav() {
         if (!sideNavVisible) return;
         sideNavVisible = false;
-        mBinding.sideNav.animate().translationX(-sideNavWidth).setDuration(200).withEndAction(() -> {
+        mBinding.sideNav.animate().translationX(sideNavFromLeft ? -sideNavWidth : sideNavWidth).setDuration(200).withEndAction(() -> {
             mBinding.sideNav.setVisibility(View.GONE);
             mBinding.sideNavOverlay.setVisibility(View.GONE);
         }).start();
@@ -592,6 +596,47 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             wideWindow = wide;
             RefreshEvent.home();
         }
+    }
+
+    /**
+     * ★ 哪边边缘侧滑从哪边弹出：监听左右边缘的水平滑动（不依赖 BackEvent，无 API 34 引用）。
+     * 仅当侧栏隐藏且在首页可返回时检测；Android 15+ 系统预测性返回手势可能占用边缘，
+     * 此时该手势收不到，回退 onBackInvoked（默认左侧）。
+     */
+    @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (!sideNavVisible && mManager.canBack(0) && !PlaybackService.isRunning()) {
+            int edge = ResUtil.dp2px(48);
+            int sw = ResUtil.getScreenWidth(this);
+            switch (ev.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    mSideDownX = ev.getX();
+                    mSideDownY = ev.getY();
+                    if (mSideDownX <= edge) mSideEdge = -1;
+                    else if (mSideDownX >= sw - edge) mSideEdge = 1;
+                    else mSideEdge = 0;
+                    break;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    if (mSideEdge != 0 && mSideDownX >= 0) {
+                        float dx = ev.getX() - mSideDownX;
+                        float dy = ev.getY() - mSideDownY;
+                        if (Math.abs(dx) > ResUtil.dp2px(60) && Math.abs(dx) > 2 * Math.abs(dy)) {
+                            sideNavFromLeft = (mSideEdge == -1);
+                            mSideEdge = 0;
+                            mSideDownX = -1;
+                            showSideNav();
+                            return true;
+                        }
+                    }
+                    break;
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    mSideEdge = 0;
+                    mSideDownX = -1;
+                    break;
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override

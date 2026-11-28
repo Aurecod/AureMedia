@@ -69,10 +69,6 @@
         </provider>
 
         <provider
-            android:name="cat.ereza.customactivityoncrash.CaocInitProvider"
-            tools:node="remove" />
-
-        <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
