@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.setting.InterfaceOrderStore;
 import com.fongmi.android.tv.databinding.AdapterConfigBinding;
@@ -20,6 +21,7 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     private List<Config> mItems;
     private boolean readOnly;
     private boolean protectCurrent;
+    private boolean followVod;
     private Config current;
 
     public ConfigAdapter(OnClickListener listener) {
@@ -54,9 +56,27 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     public ConfigAdapter addAll(int type, Config current) {
         this.current = current;
         mItems = type == 0 ? InterfaceOrderStore.sortVodConfigs(Config.getAll(type)) : Config.getAll(type);
+        // 直播源列表第 0 项："跟随点播源"（直播 URL = 点播 URL，加载点播订阅里的 lives）
+        followVod = false;
+        if (type == 1) {
+            String vodUrl = VodConfig.getUrl();
+            if (!TextUtils.isEmpty(vodUrl) && !hasUrl(mItems, vodUrl)) {
+                mItems.add(0, Config.create(1, vodUrl, "跟随点播源"));
+                followVod = true;
+            }
+        }
         String currentUrl = current == null ? null : current.getUrl();
         if (!readOnly && !protectCurrent && !TextUtils.isEmpty(currentUrl)) mItems.removeIf(item -> TextUtils.equals(item.getUrl(), currentUrl));
         return this;
+    }
+
+    private boolean hasUrl(List<Config> items, String url) {
+        for (Config item : items) if (TextUtils.equals(item.getUrl(), url)) return true;
+        return false;
+    }
+
+    public boolean isFollowVod(int position) {
+        return followVod && position == 0;
     }
 
     private boolean isCurrent(Config item) {
@@ -105,16 +125,17 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Config item = mItems.get(position);
         boolean current = isCurrent(item);
-        holder.binding.text.setText(item.getDesc());
+        boolean followVod = isFollowVod(position);
+        holder.binding.text.setText(followVod ? "跟随点播源" : item.getDesc());
         holder.binding.text.setEnabled(!current);
         holder.binding.text.setFocusable(!current);
         holder.binding.text.setOnClickListener(v -> {
             if (!current) listener.onTextClick(item);
         });
-        holder.binding.text.setOnLongClickListener(v -> !current && listener.onTextLongClick(holder));
-        holder.binding.edit.setVisibility(readOnly ? View.GONE : View.VISIBLE);
+        holder.binding.text.setOnLongClickListener(v -> !current && !followVod && listener.onTextLongClick(holder));
+        holder.binding.edit.setVisibility(followVod || readOnly ? View.GONE : View.VISIBLE);
         holder.binding.edit.setOnClickListener(v -> listener.onEditClick(item));
-        holder.binding.delete.setVisibility(readOnly ? View.GONE : View.VISIBLE);
+        holder.binding.delete.setVisibility(followVod || readOnly ? View.GONE : View.VISIBLE);
         holder.binding.delete.setAlpha(current ? 0.38f : 1f);
         holder.binding.delete.setOnClickListener(v -> listener.onDeleteClick(item));
     }
