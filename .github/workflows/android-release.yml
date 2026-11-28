@@ -141,16 +141,19 @@ jobs:
           if [ -z "$TAG" ]; then
             TAG="$TAG_DEFAULT"
           fi
-          if ! printf '%s' "$TAG" | grep -Eq "$TAG_PATTERN"; then
-            echo "::error title=Invalid release tag::Expected $TAG_EXPECT, got: $TAG"
-            exit 1
-          fi
-          if EXISTING_TAG_SHA="$(git rev-parse "$TAG^{commit}" 2>/dev/null)"; then
-            if [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
-              echo "::error title=Existing release tag targets another commit::$TAG points to $EXISTING_TAG_SHA, expected $GITHUB_SHA"
+          # ★ build 模式不发布：跳过 release tag 校验（tag 可能残留指向历史 build commit）
+          if [ "$BUILD_MODE" != "build" ]; then
+            if ! printf '%s' "$TAG" | grep -Eq "$TAG_PATTERN"; then
+              echo "::error title=Invalid release tag::Expected $TAG_EXPECT, got: $TAG"
               exit 1
             fi
-            echo "::notice title=Reusing release tag::$TAG already points to this commit"
+            if EXISTING_TAG_SHA="$(git rev-parse "$TAG^{commit}" 2>/dev/null)"; then
+              if [ "$EXISTING_TAG_SHA" != "$GITHUB_SHA" ]; then
+                echo "::error title=Existing release tag targets another commit::$TAG points to $EXISTING_TAG_SHA, expected $GITHUB_SHA"
+                exit 1
+              fi
+              echo "::notice title=Reusing release tag::$TAG already points to this commit"
+            fi
           fi
           # ★ build 模式：把递增后的 buildSeq 提交回 main（供 build job checkout 拿到新值，关于页显示 build⁺N）
           if [ "$BUILD_MODE" = "build" ]; then
