@@ -357,6 +357,13 @@ public class VodFragment extends BaseFragment implements ConfigListener, SiteLis
             SearchActivity.start(requireActivity(), "", getHome().getKey());
             return true;
         });
+        View history = mBinding.toolbar.findViewById(R.id.history);
+        if (history != null) {
+            history.setOnLongClickListener(view -> {
+                KeepActivity.start(requireActivity());
+                return true;
+            });
+        }
     }
 
     private void showProgress() {
