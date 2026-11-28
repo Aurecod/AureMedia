@@ -191,6 +191,10 @@ public class ConfigDialog extends BaseAlertDialog {
             binding.url.append("ssets://");
         } else if (s.length() > 1) {
             append = false;
+            // ★ 名称自动写入：URL 有效且名称为空时，从 URL 推导名称（对标 FongMi UrlUtil.getName）
+            if (TextUtils.isEmpty(binding.name.getText()) && s.length() > 4) {
+                binding.name.setText(com.fongmi.android.tv.utils.UrlUtil.getName(s));
+            }
         } else if (s.isEmpty()) {
             append = true;
         }
@@ -215,6 +219,10 @@ public class ConfigDialog extends BaseAlertDialog {
 
     private Config saveConfig(String url, String name, String addresses) {
         Config saved;
+        // ★ 名称自动写入：名称留空时从 URL 推导（对标 FongMi UrlUtil.getName）
+        if (TextUtils.isEmpty(name) && !TextUtils.isEmpty(url)) {
+            name = com.fongmi.android.tv.utils.UrlUtil.getName(url);
+        }
         if (url.isEmpty()) {
             if (!edit) return null;
             if (!TextUtils.isEmpty(ori)) Config.delete(ori, type);
