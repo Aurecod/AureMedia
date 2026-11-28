@@ -102,8 +102,15 @@ jobs:
             BUILD_MODE="release"
           fi
           if [ "$BUILD_MODE" = "build" ]; then
-            BUILD_SUFFIX="build"
-            APK_SUFFIX="-build"
+            # ★ 同版本每次 build 递增计数（build → build-2 → build-3 …），关于页以 build⁺N 上标显示
+            NEW_SEQ="$(bash scripts/bump_build.sh --apply)"
+            if [ "$NEW_SEQ" = "1" ]; then
+              BUILD_SUFFIX="build"
+              APK_SUFFIX="-build"
+            else
+              BUILD_SUFFIX="build-${NEW_SEQ}"
+              APK_SUFFIX="-build-${NEW_SEQ}"
+            fi
           else
             BUILD_SUFFIX=""
           fi
@@ -116,18 +123,14 @@ jobs:
             fi
           fi
           if [ "$CHANNEL" = "beta" ]; then
-            if [ "$BUILD_MODE" = "build" ]; then
-              APK_SUFFIX="-build"
-            else
+            if [ "$BUILD_MODE" != "build" ]; then
               APK_SUFFIX="-beta"
             fi
             TAG_PATTERN="^v${VERSION_NAME}-beta$"
             TAG_DEFAULT="v${VERSION_NAME}-beta"
             TAG_EXPECT="v${VERSION_NAME}-beta"
           else
-            if [ "$BUILD_MODE" = "build" ]; then
-              APK_SUFFIX="-build"
-            else
+            if [ "$BUILD_MODE" != "build" ]; then
               APK_SUFFIX=""
             fi
             TAG_PATTERN="^v${VERSION_NAME}$"
@@ -148,6 +151,14 @@ jobs:
               exit 1
             fi
             echo "::notice title=Reusing release tag::$TAG already points to this commit"
+          fi
+          # ★ build 模式：把递增后的 buildSeq 提交回 main（供 build job checkout 拿到新值，关于页显示 build⁺N）
+          if [ "$BUILD_MODE" = "build" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add app/build.gradle
+            git commit -m "chore(build): bump build seq to ${NEW_SEQ}" || echo "no build seq change to commit"
+            git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:"${GITHUB_REF#refs/heads/}" 2>&1 | tail -2 || true
           fi
           {
             echo "tag=$TAG"

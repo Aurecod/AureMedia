@@ -91,7 +91,7 @@ public class SettingFragment extends BaseFragment implements ConfigListener, Sit
         mBinding.vodUrl.setText(VodConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.isFollowVod() ? "跟随点播" : LiveConfig.getDesc());
         setWallText();
-        mBinding.versionText.setText(AppVersion.fullName());
+        mBinding.versionText.setText(AppVersion.displayName());
         setOtherText();
         setCacheText();
     }

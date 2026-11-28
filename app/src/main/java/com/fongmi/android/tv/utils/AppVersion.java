@@ -26,6 +26,39 @@ public final class AppVersion {
         return stripPrefix(tag);
     }
 
+    /** build 计数（同版本每次 build +1，CI 递增写回 build.gradle 的 buildSeq）。 */
+    public static int buildSeq() {
+        try {
+            return Integer.parseInt(BuildConfig.BUILD_SEQ);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * ★ 关于页显示名：版本 + build 计数以上角标加在 build 上（如 {@code 1.0.9-build⁺²}）。
+     * 上角标只加在 build 标识上，不改主版本号。
+     */
+    public static String displayName() {
+        String base = fullName();
+        if (base.isEmpty()) return base;
+        int seq = buildSeq();
+        if (seq <= 0) return base;
+        // 去掉 -build-N / -build 后缀，统一还原为 versionBase-build 再附上标计数
+        String cleaned = base.replaceFirst("(?i)-build(?:-[0-9]+)?$", "");
+        return cleaned + "-build" + superscript(seq);
+    }
+
+    private static String superscript(int n) {
+        char[] map = {'⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'};
+        StringBuilder sb = new StringBuilder("⁺");
+        for (char c : String.valueOf(n).toCharArray()) {
+            int d = c - '0';
+            sb.append(d >= 0 && d <= 9 ? map[d] : c);
+        }
+        return sb.toString();
+    }
+
     public static boolean isCurrent(String name) {
         return stripPrefix(name).equals(stripPrefix(fullName()));
     }
