@@ -14,6 +14,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
@@ -44,7 +45,16 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
     }
 
     public void addAll(Result result) {
-        mItems.addAll(result.getTypes());
+        // 分类栏去除"推荐"：源返回的类别里常带"推荐"（tvbox list_class 首项），
+        // 推荐内容由首页推荐区承载，不在分类栏重复出现。
+        List<Class> types = new ArrayList<>(result.getTypes());
+        Iterator<Class> it = types.iterator();
+        while (it.hasNext()) {
+            Class item = it.next();
+            String name = item.getTypeName() == null ? "" : item.getTypeName();
+            if (name.contains("推荐")) it.remove();
+        }
+        mItems.addAll(types);
         if (!result.getList().isEmpty()) mItems.add(0, home());
         if (!mItems.isEmpty()) mItems.get(0).setSelected(true);
         notifyDataSetChanged();
