@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -175,12 +175,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -189,12 +189,12 @@ jobs:
       # Chaquopy pins buildPython to 3.10 (chaquo/build.gradle) and fails on a
       # different interpreter, so 3.10 must be the python3 on PATH for Gradle.
       - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
@@ -248,13 +248,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -263,7 +263,7 @@ jobs:
       # Chaquopy pins buildPython to 3.10 (chaquo/build.gradle) and fails on a
       # different interpreter, so 3.10 must be the python3 on PATH for Gradle.
       - name: Set up Python 3.10
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
 
@@ -271,7 +271,7 @@ jobs:
         run: bash scripts/verify_mpv_native_assets.sh --require-elf
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
 
@@ -362,7 +362,7 @@ jobs:
           ls -lh dist/
 
       - name: Upload ${{ matrix.variant }} APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: apk-${{ matrix.variant }}
           path: dist/*.apk
@@ -377,19 +377,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Python 3.10
         if: ${{ inputs.build_mode != 'build' }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.10"
 
       - name: Download release APKs
         if: ${{ inputs.build_mode != 'build' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: apk-*
           path: dist
@@ -594,7 +594,7 @@ jobs:
 
       - name: Upload workflow artifacts
         if: ${{ inputs.build_mode != 'build' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: auremedia-${{ needs.meta.outputs.tag }}
           path: dist/*
