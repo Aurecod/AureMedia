@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
         <!-- 音源管理 block（对标 src-list + src-add-panel） -->
         <LinearLayout

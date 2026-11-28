@@ -1,10 +1,11 @@
 package com.fongmi.android.tv.music;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivityMusicBinding;
@@ -13,25 +14,31 @@ import com.fongmi.android.tv.music.ui.MusicLibFragment;
 import com.fongmi.android.tv.music.ui.MusicPlayer;
 import com.fongmi.android.tv.music.ui.MusicSearchFragment;
 import com.fongmi.android.tv.music.ui.MusicSettingFragment;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 
-public class MusicActivity extends AppCompatActivity {
+public class MusicActivity extends BaseActivity {
 
     private ActivityMusicBinding mBinding;
     private int currentTab = 0;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected ViewBinding getBinding() {
         mBinding = ActivityMusicBinding.inflate(getLayoutInflater());
-        setContentView(mBinding.getRoot());
+        return mBinding;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); // BaseActivity 处理状态栏 edge-to-edge
 
         mBinding.musicTabHome.setOnClickListener(v -> switchTab(0));
         mBinding.musicTabLib.setOnClickListener(v -> switchTab(1));
         mBinding.musicTabSearch.setOnClickListener(v -> switchTab(2));
         mBinding.musicTabSetting.setOnClickListener(v -> switchTab(3));
 
-        // 迷你播放条：播放/暂停切换 + 显示当前歌曲
+        // 迷你播放条：播放/暂停切换 + 显示当前歌曲 + 点击展开播放页
         mBinding.musicMiniPlay.setOnClickListener(v -> MusicPlayer.get().togglePlay());
+        mBinding.musicMini.setOnClickListener(v -> startActivity(new Intent(this, MusicPlayActivity.class)));
         MusicPlayer.get().setListener((song, playing) -> runOnUiThread(() -> updateMini(song, playing)));
         updateMini(MusicPlayer.get().currentSong(), MusicPlayer.get().isPlaying());
 

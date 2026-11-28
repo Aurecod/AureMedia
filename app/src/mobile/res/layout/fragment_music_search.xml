@@ -3,17 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="搜索"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:paddingBottom="12dp" />
-
+    <!-- 搜索框 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,8 +17,9 @@
             android:layout_width="0dp"
             android:layout_height="44dp"
             android:layout_weight="1"
+            android:layout_marginStart="16dp"
             android:background="#1A1D26"
-            android:hint="搜索歌曲、歌手、专辑"
+            android:hint="歌曲、歌手、专辑、歌单"
             android:paddingHorizontal="12dp"
             android:textSize="14sp"
             android:textColor="#FFFFFF"
@@ -35,18 +29,47 @@
             android:id="@+id/musicSearchBtn"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:paddingHorizontal="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="#FFFFFF"
             android:gravity="center"
+            android:paddingHorizontal="20dp"
             android:text="搜索"
             android:textSize="14sp"
-            android:textColor="#12141A"
-            android:background="#FFFFFF"
-            android:layout_marginStart="8dp" />
+            android:textColor="#12141A" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/musicSearchList"
+    <!-- 分类 tabs：歌曲/歌手/专辑/歌单 -->
+    <LinearLayout
+        android:id="@+id/searchTabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" />
+
+    <!-- 搜索热词 chips -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/searchChips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+
+            <LinearLayout
+                android:id="@+id/searchResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

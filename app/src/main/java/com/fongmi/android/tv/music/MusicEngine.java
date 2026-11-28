@@ -110,6 +110,13 @@ public class MusicEngine {
         return new ArrayList<>();
     }
 
+    /** 分类搜索（type=1歌曲/100歌手/10专辑/1000歌单），返回 MusicSong 或 String 名称 */
+    public static List<Object> searchType(Context ctx, String keyword, int type) throws Exception {
+        String platform = getPlatform(ctx);
+        if (PLATFORM_NETEASE.equals(platform)) return NeteaseApi.searchType(keyword, type);
+        return new ArrayList<>(search(ctx, keyword));
+    }
+
     /** 按平台热榜 */
     public static List<MusicSong> hot(Context ctx) throws Exception {
         String platform = getPlatform(ctx);
@@ -118,6 +125,27 @@ public class MusicEngine {
         if (PLATFORM_KUWO.equals(platform)) return KuwoApi.hot();
         if (PLATFORM_KUGOU.equals(platform)) return KugouApi.hot();
         if (PLATFORM_MIGU.equals(platform)) return MiguApi.hot();
+        return new ArrayList<>();
+    }
+
+    /** 为你推荐（网易推荐歌单） */
+    public static List<MusicPlaylist> recommend(Context ctx) throws Exception {
+        String platform = getPlatform(ctx);
+        if (PLATFORM_NETEASE.equals(platform)) return NeteaseApi.recommend();
+        return new ArrayList<>();
+    }
+
+    /** 精品榜单（网易各榜单） */
+    public static List<MusicPlaylist> ranks(Context ctx) throws Exception {
+        String platform = getPlatform(ctx);
+        if (PLATFORM_NETEASE.equals(platform)) return NeteaseApi.ranks();
+        return new ArrayList<>();
+    }
+
+    /** 频道（网易热门歌单分类） */
+    public static List<MusicPlaylist> channels(Context ctx) throws Exception {
+        String platform = getPlatform(ctx);
+        if (PLATFORM_NETEASE.equals(platform)) return NeteaseApi.channels();
         return new ArrayList<>();
     }
 
@@ -130,6 +158,20 @@ public class MusicEngine {
         if (PLATFORM_KUGOU.equals(platform)) return KugouApi.resolveUrl(song.id);
         if (PLATFORM_MIGU.equals(platform)) return MiguApi.resolveUrl(song.id);
         return null;
+    }
+
+    /** 歌词行（时间ms + 文本） */
+    public static class LyricLine {
+        public long time;
+        public String text;
+        public LyricLine(long time, String text) { this.time = time; this.text = text; }
+    }
+
+    /** 获取歌词（网易 api/song/lyric，LRC 解析） */
+    public static List<LyricLine> lyric(Context ctx, MusicSong song) {
+        String platform = song.source;
+        if (PLATFORM_NETEASE.equals(platform)) return NeteaseApi.lyric(song.id);
+        return new ArrayList<>();
     }
 
     /** 通用歌曲解析（搜索/热榜共用） */
@@ -176,6 +218,37 @@ public class MusicEngine {
             }
             return list;
         }
+        /** 分类搜索（type=1歌曲/100歌手/10专辑/1000歌单） */
+        static List<Object> searchType(String kw, int type) throws Exception {
+            String url = BASE + "/api/search/get/web?type=" + type + "&s=" + URLEncoder.encode(kw, "UTF-8") + "&limit=30";
+            JSONObject obj = new JSONObject(OkHttp.string(url, headers()));
+            JSONObject result = obj.optJSONObject("result");
+            List<Object> list = new ArrayList<>();
+            if (result == null) return list;
+            JSONArray arr = null;
+            if (type == 1) arr = result.optJSONArray("songs");
+            else if (type == 100) arr = result.optJSONArray("artists");
+            else if (type == 10) arr = result.optJSONArray("albums");
+            else if (type == 1000) arr = result.optJSONArray("playlists");
+            if (arr == null) return list;
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject item = arr.optJSONObject(i);
+                if (item == null) continue;
+                if (type == 1) {
+                    MusicSong s = parseSong(item, PLATFORM_NETEASE);
+                    if (s != null) list.add(s);
+                } else {
+                    String name = item.optString("name");
+                    String sub = "";
+                    if (type == 10) {
+                        JSONObject artist = item.optJSONObject("artist");
+                        if (artist != null) sub = artist.optString("name");
+                    }
+                    list.add(name + (sub.isEmpty() ? "" : " - " + sub));
+                }
+            }
+            return list;
+        }
         static List<MusicSong> hot() throws Exception {
             String url = BASE + "/api/playlist/detail?id=3778678"; // 热歌榜
             JSONObject obj = new JSONObject(OkHttp.string(url, headers()));
@@ -192,6 +265,85 @@ public class MusicEngine {
         }
         static String resolveUrl(String id) {
             return BASE + "/song/media/outer/url?id=" + id + ".mp3";
+        }
+        /** 歌词（LRC 解析：时间ms + 文本，排序） */
+        static List<LyricLine> lyric(String id) {
+            List<LyricLine> lines = new ArrayList<>();
+            try {
+                String json = OkHttp.string(BASE + "/api/song/lyric?id=" + id + "&lv=-1&kv=-1&tv=-1", headers());
+                JSONObject obj = new JSONObject(json);
+                JSONObject lrc = obj.optJSONObject("lrc");
+                String lyric = lrc != null ? lrc.optString("lyric") : "";
+                java.util.regex.Matcher m = java.util.regex.Pattern
+                        .compile("\\[(\\d+):(\\d+)\\.(\\d+)\\](.*)")
+                        .matcher(lyric);
+                while (m.find()) {
+                    long min = Long.parseLong(m.group(1));
+                    long sec = Long.parseLong(m.group(2));
+                    long ms = Long.parseLong(m.group(3));
+                    long t = min * 60000 + sec * 1000 + ms * 10;
+                    String text = m.group(4).trim();
+                    if (!text.isEmpty() && !text.startsWith("作曲") && !text.startsWith("作词")
+                            && !text.startsWith("编曲") && !text.startsWith("制作")) {
+                        lines.add(new LyricLine(t, text));
+                    }
+                }
+                lines.sort((a, b) -> Long.compare(a.time, b.time));
+            } catch (Exception e) { }
+            return lines;
+        }
+        /** 为你推荐（推荐歌单） */
+        static List<MusicPlaylist> recommend() throws Exception {
+            String url = BASE + "/api/personalized/playlist?limit=10";
+            JSONObject obj = new JSONObject(OkHttp.string(url, headers()));
+            JSONArray result = obj.optJSONArray("result");
+            List<MusicPlaylist> list = new ArrayList<>();
+            if (result != null) {
+                for (int i = 0; i < result.length(); i++) {
+                    MusicPlaylist p = parsePlaylist(result.optJSONObject(i));
+                    if (p != null) list.add(p);
+                }
+            }
+            return list;
+        }
+        /** 精品榜单（飙升/新歌/原创榜） */
+        static List<MusicPlaylist> ranks() throws Exception {
+            int[] ids = {19723756, 3779629, 2884035, 3778678}; // 飙升/新歌/原创/热歌
+            List<MusicPlaylist> list = new ArrayList<>();
+            for (int id : ids) {
+                try {
+                    JSONObject obj = new JSONObject(OkHttp.string(BASE + "/api/playlist/detail?id=" + id, headers()));
+                    JSONObject result = obj.optJSONObject("result");
+                    JSONObject pl = result != null ? result.optJSONObject("playlist") : null;
+                    MusicPlaylist p = parsePlaylist(pl);
+                    if (p != null) list.add(p);
+                } catch (Exception e) { }
+            }
+            return list;
+        }
+        /** 频道（热门歌单分类） */
+        static List<MusicPlaylist> channels() throws Exception {
+            String url = BASE + "/api/personalized/playlist?limit=12";
+            JSONObject obj = new JSONObject(OkHttp.string(url, headers()));
+            JSONArray result = obj.optJSONArray("result");
+            List<MusicPlaylist> list = new ArrayList<>();
+            if (result != null) {
+                for (int i = 0; i < result.length(); i++) {
+                    MusicPlaylist p = parsePlaylist(result.optJSONObject(i));
+                    if (p != null) list.add(p);
+                }
+            }
+            return list;
+        }
+        static MusicPlaylist parsePlaylist(JSONObject o) {
+            if (o == null) return null;
+            MusicPlaylist p = new MusicPlaylist();
+            p.platform = PLATFORM_NETEASE;
+            p.id = o.optString("id", String.valueOf(o.optLong("id", 0)));
+            p.name = o.optString("name");
+            p.cover = o.optString("picUrl", o.optString("coverImgUrl", ""));
+            p.playCount = o.optLong("playCount", 0);
+            return p;
         }
         static Map<String, String> headers() {
             Map<String, String> h = new HashMap<>();

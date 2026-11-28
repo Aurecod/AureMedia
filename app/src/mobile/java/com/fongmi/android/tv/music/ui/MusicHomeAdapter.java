@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.music.MusicEngine;
+import com.fongmi.android.tv.music.MusicLibStore;
 import com.fongmi.android.tv.music.MusicSong;
 
 import java.util.ArrayList;
@@ -48,6 +49,16 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
             holder.title.setText(s.name);
             holder.subtitle.setText(s.singer);
             holder.itemView.setOnClickListener(v -> playSong(holder.itemView, s));
+            // 收藏按钮
+            boolean fav = MusicLibStore.isFav(holder.itemView.getContext(), s.id);
+            holder.fav.setText(fav ? "♥" : "♡");
+            holder.fav.setTextColor(fav ? 0xFFE05555 : 0xFF8A8F99);
+            holder.fav.setOnClickListener(v -> {
+                boolean nowFav = MusicLibStore.toggleFav(holder.itemView.getContext(), s);
+                holder.fav.setText(nowFav ? "♥" : "♡");
+                holder.fav.setTextColor(nowFav ? 0xFFE05555 : 0xFF8A8F99);
+                Toast.makeText(holder.itemView.getContext(), nowFav ? "已收藏" : "取消收藏", Toast.LENGTH_SHORT).show();
+            });
         } else {
             holder.title.setText((String) item);
         }
@@ -69,12 +80,13 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView title, subtitle;
+        TextView title, subtitle, fav;
 
         VH(View v) {
             super(v);
             title = v.findViewById(R.id.musicTitle);
             subtitle = v.findViewById(R.id.musicSubtitle);
+            fav = v.findViewById(R.id.musicFav);
         }
     }
 }

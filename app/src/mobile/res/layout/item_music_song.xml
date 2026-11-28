@@ -2,25 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="10dp">
+    android:paddingVertical="10dp"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/musicTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="15sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/musicSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="12sp"
+            android:textColor="#8A8F99" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/musicTitle"
-        android:layout_width="match_parent"
+        android:id="@+id/musicFav"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textSize="15sp"
-        android:textColor="#FFFFFF" />
-
-    <TextView
-        android:id="@+id/musicSubtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textSize="12sp"
+        android:padding="8dp"
+        android:text="♡"
+        android:textSize="18sp"
         android:textColor="#8A8F99" />
 </LinearLayout>

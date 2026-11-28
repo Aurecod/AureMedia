@@ -82,6 +82,12 @@
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
+        <activity
+            android:name=".music.MusicPlayActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Black.NoTitleBar"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
         <activity-alias
             android:name=".ui.activity.HomeActivityCurrent"
             android:enabled="true"
