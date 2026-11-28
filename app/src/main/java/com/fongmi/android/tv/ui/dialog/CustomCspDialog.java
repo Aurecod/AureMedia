@@ -68,6 +68,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import java.io.File;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -1164,6 +1165,12 @@ public class CustomCspDialog extends BaseAlertDialog {
             pendingFileTarget.setSelection(pendingFileTarget.length());
             pendingFileTarget.requestFocus();
             if (editor != null) editor.sync();
+            // 自动识别接口名：名称仍为自动名/空时，用首个文件名（去扩展名）作接口名
+            if (editor != null) {
+                String fileName = new File(paths.get(0)).getName();
+                String base = fileName.replaceFirst("\\.[^.]*$", "").trim();
+                if (!base.isEmpty()) editor.autoNameFromFile(base);
+            }
         }
         markJsonDirty();
         if (editMode && editor != null && item == editingItem) editor.updateValidity();
@@ -1870,6 +1877,52 @@ public class CustomCspDialog extends BaseAlertDialog {
             return focus instanceof TextInputEditText input ? input : null;
         }
 
+        void autoNameFromFile(String base) {
+            if (item == null) return;
+            if (TextUtils.isEmpty(base)) return;
+            String current = binding.name.getText() == null ? "" : binding.name.getText().toString().trim();
+            // 仅当名称仍为自动名/空时用文件名替换，不覆盖用户手输的名称
+            if (!current.isEmpty() && !isAutoName(current, item.getKind())) return;
+            bindingItem = true;
+            setText(binding.name, base);
+            bindingItem = false;
+            autoName = false;
+        }
+
+        boolean isApiField(Editable editable) {
+            return editable == binding.api.getEditableText();
+        }
+
+        void autoNameFromUrl(String url) {
+            if (item == null || TextUtils.isEmpty(url)) return;
+            String trimmed = url.trim();
+            if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) return;
+            String current = binding.name.getText() == null ? "" : binding.name.getText().toString().trim();
+            // 仅当名称仍为自动名/空时用 URL 提取名，不覆盖用户手输的名称
+            if (!current.isEmpty() && !isAutoName(current, item.getKind())) return;
+            String base = urlBaseName(trimmed);
+            if (TextUtils.isEmpty(base)) return;
+            bindingItem = true;
+            setText(binding.name, base);
+            bindingItem = false;
+            autoName = false;
+        }
+
+        private static String urlBaseName(String url) {
+            try {
+                String noQuery = url.split("[?#]")[0];
+                String path = noQuery;
+                int slash = noQuery.lastIndexOf('/');
+                if (slash >= 0) path = noQuery.substring(slash + 1);
+                if (path.isEmpty()) return "";
+                // 去掉常见扩展名
+                String base = path.replaceFirst("\\.[A-Za-z0-9]{1,8}$", "").trim();
+                return base;
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
         private void trackFileTarget(TextInputEditText... inputs) {
             for (TextInputEditText input : inputs) {
                 input.setOnFocusChangeListener((view, hasFocus) -> {
@@ -2078,6 +2131,10 @@ public class CustomCspDialog extends BaseAlertDialog {
         @Override
         public void afterTextChanged(Editable editable) {
             editor.sync();
+            // 在线接口自动识别名称：api 字段变化时从 URL 提取接口名（名称仍为自动名时）
+            if (editor.isApiField(editable)) {
+                editor.autoNameFromUrl(editable.toString());
+            }
         }
     }
 }

@@ -2246,38 +2246,7 @@ function renderConfigsManage() {
     $('#configFilterVod').toggleClass('active', configFilter === 0);
     $('#configFilterLive').toggleClass('active', configFilter === 1);
     $('#configFilterWall').toggleClass('active', configFilter === 2);
-    // 直播列表第 0 项：跟随点播源（直播接口 = 点播接口，解析订阅里的 lives）
-    let html = '';
-    if (Number(configFilter) === 1) html += buildFollowVodCard();
-    html += filtered.map(buildConfigCard).join('') || '<div class="empty-state">暂无接口配置</div>';
-    $('#configList').html(html);
-}
-function buildFollowVodCard() {
-    const vod = configsData.find(item => Number(item.type) === 0 && item.active) || configsData.find(item => Number(item.type) === 0);
-    const vodUrl = vod ? vod.url || '' : '';
-    const live = configsData.find(item => Number(item.type) === 1 && item.active);
-    const isActive = !!vodUrl && !!live && live.url === vodUrl;
-    return `<div class="config-card${isActive ? ' active' : ''}">
-        <div class="config-main">
-            <div class="config-title-line"><span class="config-type">直播</span><strong>跟随点播源</strong>${isActive ? '<em>当前</em>' : ''}</div>
-            <div class="config-url">${vodUrl ? '使用点播接口：' + escHtml(vodUrl) : '当前没有可跟随的点播接口'}</div>
-        </div>
-        <div class="config-actions">
-            <button class="file-action" type="button" onclick="followVod()"${isActive ? ' disabled' : ''}>启用</button>
-        </div>
-    </div>`;
-}
-function followVod() {
-    const vod = configsData.find(item => Number(item.type) === 0 && item.active) || configsData.find(item => Number(item.type) === 0);
-    if (!vod || !vod.url) { warnToast('没有可跟随的点播接口'); return; }
-    postJson('/manage/configs', { type: 1, name: '跟随点播源', url: vod.url }, data => {
-        configsData = data.items || [];
-        configsLoadedKey = activeKey();
-        configFilter = 1;
-        renderConfigsManage();
-        // 保存后立即启用该直播接口（url=点播 url -> LiveConfig sync 解析订阅 lives）
-        useConfig(1, vod.url);
-    }, '跟随点播源保存失败');
+    $('#configList').html(filtered.map(buildConfigCard).join('') || '<div class="empty-state">暂无接口配置</div>');
 }
 function setConfigFilter(type) {
     configFilter = Number(type);
@@ -2338,12 +2307,6 @@ function onConfigLocalFileSelected() {
             const path = CONFIG_UPLOAD_DIR + '/' + file.name;
             const prefix = Number($('#configType').val() || 0) === 2 ? 'file:/' : 'file://';
             $('#configUrl').val(prefix + path);
-            // 自动识别接口名：名称留空时从文件名去扩展名提取（Hunter.json -> Hunter）
-            const nameInput = $('#configName');
-            if (!nameInput.val().trim()) {
-                const guessed = file.name.replace(/\.[^.]*$/, '').trim();
-                if (guessed) nameInput.val(guessed);
-            }
             warnToast('文件已上传并填入接口地址');
         })
         .fail((xhr, status) => warnToast(requestError(xhr, status, '本地文件上传失败')))
