@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Config;
@@ -145,17 +146,40 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         boolean current = isCurrent(item);
         boolean followVod = isFollowVod(position);
         holder.binding.text.setText(followVod ? "跟随点播源" : item.getDesc());
-        holder.binding.text.setEnabled(!current);
+        holder.binding.text.setEnabled(true);
         holder.binding.text.setFocusable(!current);
         holder.binding.text.setOnClickListener(v -> {
             if (!current) listener.onTextClick(item);
         });
         holder.binding.text.setOnLongClickListener(v -> !current && !followVod && listener.onTextLongClick(holder));
+        // ★ 当前项：填充颜色高亮（对标站源切换 selected 状态）
+        applyCurrentHighlight(holder, current);
         holder.binding.edit.setVisibility(followVod || readOnly ? View.GONE : View.VISIBLE);
         holder.binding.edit.setOnClickListener(v -> listener.onEditClick(item));
         holder.binding.delete.setVisibility(followVod || readOnly ? View.GONE : View.VISIBLE);
         holder.binding.delete.setAlpha(current ? 0.38f : 1f);
         holder.binding.delete.setOnClickListener(v -> listener.onDeleteClick(item));
+    }
+
+    /** 当前接口项 = 填充 primary 色 + onPrimary 字（对标 SiteDialogTheme 站源 selected）；非当前 = 原描边样式 */
+    private void applyCurrentHighlight(ViewHolder holder, boolean current) {
+        android.content.Context ctx = holder.itemView.getContext();
+        int primary = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorPrimary);
+        int onPrimary = com.google.android.material.color.MaterialColors.getColor(ctx, com.google.android.material.R.attr.colorOnPrimary);
+        android.content.res.ColorStateList normalBg = androidx.core.content.ContextCompat.getColorStateList(ctx, R.color.dialog_outlined_button_bg);
+        android.content.res.ColorStateList normalText = androidx.core.content.ContextCompat.getColorStateList(ctx, R.color.dialog_outlined_button_text);
+        if (current) {
+            holder.binding.text.setBackgroundTintList(new android.content.res.ColorStateList(
+                    new int[][]{{android.R.attr.state_selected}, {}},
+                    new int[]{primary, normalBg.getDefaultColor()}));
+            holder.binding.text.setTextColor(new android.content.res.ColorStateList(
+                    new int[][]{{android.R.attr.state_selected}, {}},
+                    new int[]{onPrimary, normalText.getDefaultColor()}));
+        } else {
+            holder.binding.text.setBackgroundTintList(normalBg);
+            holder.binding.text.setTextColor(normalText);
+        }
+        holder.binding.text.setSelected(current);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
