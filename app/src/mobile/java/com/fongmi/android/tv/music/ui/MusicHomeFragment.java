@@ -44,7 +44,7 @@ public class MusicHomeFragment extends Fragment {
         // 悬浮按钮 + 内容容器避过状态栏（edge-to-edge）
         if (getView() != null) {
             androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(getView(), (v, insets) -> {
-                int sb = insets.getInsets(androidx.core.graphics.Insets.Type.statusBars()).top;
+                int sb = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars()).top;
                 android.view.ViewGroup.MarginLayoutParams lp = (android.view.ViewGroup.MarginLayoutParams) mPlatformBtn.getLayoutParams();
                 lp.topMargin = sb + dp(8);
                 mPlatformBtn.setLayoutParams(lp);
@@ -163,11 +163,16 @@ public class MusicHomeFragment extends Fragment {
         LinearLayout card = new LinearLayout(getContext());
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(6), dp(6), dp(6), dp(6));
-        ImageView cover = new ImageView(getContext());
+        // 封面容器（FrameLayout：可叠占位文字）
+        FrameLayout coverWrap = new FrameLayout(getContext());
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(coverSize, coverSize);
-        cover.setLayoutParams(clp);
+        coverWrap.setLayoutParams(clp);
+        coverWrap.setBackground(rounded(cardBg(), 10));
+        ImageView cover = new ImageView(getContext());
+        cover.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         cover.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        cover.setBackground(rounded(cardBg(), 10));
+        coverWrap.addView(cover);
         if (p.cover != null && !p.cover.isEmpty()) {
             Glide.with(this).load(p.cover).into(cover);
         } else {
@@ -177,10 +182,11 @@ public class MusicHomeFragment extends Fragment {
             ph.setTextSize(20);
             ph.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFF8A8F99 : 0xFF9A9FA8);
             ph.setGravity(Gravity.CENTER);
-            cover.addView(ph, new FrameLayout.LayoutParams(
+            ph.setLayoutParams(new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            coverWrap.addView(ph);
         }
-        card.addView(cover);
+        card.addView(coverWrap);
         TextView name = new TextView(getContext());
         name.setText(p.name);
         name.setTextSize(12);
@@ -264,7 +270,7 @@ public class MusicHomeFragment extends Fragment {
             tv.setPadding(dp(24), dp(18), dp(24), dp(18));
             boolean sel = plats[i].equals(current);
             tv.setTextColor(sel ? 0xFFFFFFFF : 0xFF8A8F99);
-            tv.setBackground(rounded(sel ? MusicEngine.platformColor(plats[idx]) : 0xFF3A3F4A, 14));
+            tv.setBackground(rounded(sel ? MusicEngine.platformColor(plats[i]) : 0xFF3A3F4A, 14));
             final int idx = i;
             tv.setOnClickListener(v -> {
                 MusicEngine.setPlatform(getContext(), plats[idx]);
