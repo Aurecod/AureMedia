@@ -191,13 +191,21 @@ public class ConfigDialog extends BaseAlertDialog {
             binding.url.append("ssets://");
         } else if (s.length() > 1) {
             append = false;
-            // ★ 名称自动写入：URL 有效且名称为空时，从 URL 推导名称（对标 FongMi UrlUtil.getName）
+            // ★ 名称自动写入：URL 有效且名称为空时，从 URL 推导名称（对标 FongMi UrlUtil.getName），去掉文件后缀
             if (TextUtils.isEmpty(binding.name.getText()) && s.length() > 4) {
-                binding.name.setText(com.fongmi.android.tv.utils.UrlUtil.getName(s));
+                binding.name.setText(stripExtension(com.fongmi.android.tv.utils.UrlUtil.getName(s)));
             }
         } else if (s.isEmpty()) {
             append = true;
         }
+    }
+
+    /** 去掉配置文件名后缀（.json/.txt/.m3u/.m3u8/.xml 等），如 Hunter.json → Hunter */
+    private String stripExtension(String name) {
+        if (TextUtils.isEmpty(name)) return name;
+        int idx = name.lastIndexOf('.');
+        if (idx > 0 && name.length() - idx <= 5) return name.substring(0, idx);
+        return name;
     }
 
     private void onPositive() {
@@ -219,9 +227,9 @@ public class ConfigDialog extends BaseAlertDialog {
 
     private Config saveConfig(String url, String name, String addresses) {
         Config saved;
-        // ★ 名称自动写入：名称留空时从 URL 推导（对标 FongMi UrlUtil.getName）
+        // ★ 名称自动写入：名称留空时从 URL 推导（对标 FongMi UrlUtil.getName），去掉文件后缀
         if (TextUtils.isEmpty(name) && !TextUtils.isEmpty(url)) {
-            name = com.fongmi.android.tv.utils.UrlUtil.getName(url);
+            name = stripExtension(com.fongmi.android.tv.utils.UrlUtil.getName(url));
         }
         if (url.isEmpty()) {
             if (!edit) return null;
