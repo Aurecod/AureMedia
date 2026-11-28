@@ -20,11 +20,6 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
 
     private final List<Object> mItems = new ArrayList<>();
     private static final int TYPE_HEADER = 0, TYPE_SONG = 1;
-    private MusicPlayer mPlayer;
-
-    public MusicHomeAdapter() {
-        mPlayer = new MusicPlayer();
-    }
 
     public void setItems(List<Object> items) {
         mItems.clear();
@@ -65,7 +60,7 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
             return;
         }
         Toast.makeText(v.getContext(), "播放：" + s.name, Toast.LENGTH_SHORT).show();
-        mPlayer.play(v.getContext(), s.name, url);
+        MusicPlayer.get().play(v.getContext(), s);
     }
 
     @Override

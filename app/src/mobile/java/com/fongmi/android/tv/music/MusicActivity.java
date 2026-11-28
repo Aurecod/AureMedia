@@ -10,6 +10,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivityMusicBinding;
 import com.fongmi.android.tv.music.ui.MusicHomeFragment;
 import com.fongmi.android.tv.music.ui.MusicLibFragment;
+import com.fongmi.android.tv.music.ui.MusicPlayer;
 import com.fongmi.android.tv.music.ui.MusicSearchFragment;
 import com.fongmi.android.tv.music.ui.MusicSettingFragment;
 
@@ -29,7 +30,32 @@ public class MusicActivity extends AppCompatActivity {
         mBinding.musicTabSearch.setOnClickListener(v -> switchTab(2));
         mBinding.musicTabSetting.setOnClickListener(v -> switchTab(3));
 
+        // 迷你播放条：播放/暂停切换 + 显示当前歌曲
+        mBinding.musicMiniPlay.setOnClickListener(v -> MusicPlayer.get().togglePlay());
+        MusicPlayer.get().setListener((song, playing) -> runOnUiThread(() -> updateMini(song, playing)));
+        updateMini(MusicPlayer.get().currentSong(), MusicPlayer.get().isPlaying());
+
         switchTab(0);
+    }
+
+    /** 更新迷你播放条 */
+    private void updateMini(MusicSong song, boolean playing) {
+        if (song == null) {
+            mBinding.musicMini.setVisibility(android.view.View.GONE);
+            return;
+        }
+        mBinding.musicMini.setVisibility(android.view.View.VISIBLE);
+        mBinding.musicMiniTitle.setText(song.name);
+        mBinding.musicMiniSinger.setText(song.singer);
+        mBinding.musicMiniPlay.setImageResource(
+                playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 播放器单例不释放（后台继续播），但清监听
+        MusicPlayer.get().setListener(null);
     }
 
     private void switchTab(int index) {
