@@ -41,10 +41,7 @@ public class MusicEngine {
             "QQ", "网易", "酷我", "酷狗", "咪咕"
     };
 
-    // 内置音源（官方平台音源，无需 key；对标 am-4u2 aq_sources 音源驱动）
-    private static final MusicSource[] SOURCES = {
-            new MusicSource("netease", "网易云音源", "api", PLATFORM_NETEASE, PLATFORM_QQ, PLATFORM_KUWO, PLATFORM_KUGOU, PLATFORM_MIGU),
-    };
+    // 内置音源由 MusicSourceStore 管理（预置 4 个 + 导入），此处不硬编码
 
     public static String[] platforms() { return PLATFORMS; }
 
@@ -57,26 +54,31 @@ public class MusicEngine {
         return 0;
     }
 
-    /** 当前主页展示平台（默认网易，已验证可用） */
+    /** 当前主页展示平台（默认网易，从 active 音源声明的平台读取） */
     public static String getPlatform(Context ctx) {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        String p = sp.getString(KEY_PLATFORM, PLATFORM_NETEASE);
-        return p != null ? p : PLATFORM_NETEASE;
+        String p = sp.getString(KEY_PLATFORM, null);
+        if (p != null) return p;
+        // 未选平台 → 用 active 音源第一个支持平台
+        MusicSource src = MusicSourceStore.getActive(ctx);
+        if (src != null && src.platforms != null && src.platforms.length > 0) {
+            String first = src.platforms[0];
+            for (String pp : PLATFORMS) if (pp.equals(first)) return pp;
+        }
+        return PLATFORM_NETEASE;
     }
 
     public static void setPlatform(Context ctx, String platform) {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_PLATFORM, platform).apply();
     }
 
-    /** 当前音源（默认网易，音源决定支持平台） */
+    /** 当前 active 音源 id（音源决定支持平台） */
     public static String getSource(Context ctx) {
-        SharedPreferences sp = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        String s = sp.getString(KEY_SOURCE, "netease");
-        return s != null ? s : "netease";
+        return MusicSourceStore.getActive(ctx).id;
     }
 
     public static void setSource(Context ctx, String source) {
-        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_SOURCE, source).apply();
+        MusicSourceStore.setActive(ctx, source);
     }
 
     /** 按平台搜索 */
