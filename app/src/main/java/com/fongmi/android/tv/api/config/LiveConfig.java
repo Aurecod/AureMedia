@@ -23,6 +23,7 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Header;
 import com.github.catvod.bean.Proxy;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.Trans;
 import com.google.gson.JsonObject;
 
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class LiveConfig extends BaseConfig {
 
     private static final String TAG = LiveConfig.class.getSimpleName();
+    private static final String KEY_LIVE_FOLLOW_VOD = "live_follow_vod";
 
     private Live home;
     private List<Live> lives;
@@ -50,6 +52,18 @@ public class LiveConfig extends BaseConfig {
 
     public static String getUrl() {
         return get().getConfig().getUrl();
+    }
+
+    /**
+     * ★ 显式"跟随点播源"开关（对标 QussMedia/AVBox live_follow_vod，默认开启）。
+     * 开启时直播直接用点播当前订阅解析 lives；关闭时才用直播自己的 TYPE_LIVE 订阅。
+     */
+    public static boolean isFollowVod() {
+        return Prefers.getBoolean(KEY_LIVE_FOLLOW_VOD, true);
+    }
+
+    public static void setFollowVod(boolean follow) {
+        Prefers.put(KEY_LIVE_FOLLOW_VOD, follow);
     }
 
     public static String getDesc() {
@@ -118,8 +132,13 @@ public class LiveConfig extends BaseConfig {
 
     @Override
     protected Config defaultConfig() {
-        // ★ 默认跟随点播源（对标 AVBox live_follow_vod 默认开启）：
-        // 没有独立直播订阅时，直接用点播当前订阅解析 lives，无需用户再配一次地址。
+        // ★ 显式跟随点播源 flag（对标 QussMedia/AVBox live_follow_vod 默认开启）：
+        // 开启时直接用点播当前订阅解析 lives（点播为空才回退直播订阅）；
+        // 关闭时才用直播自己的 TYPE_LIVE 订阅。
+        if (isFollowVod()) {
+            Config vod = Config.vod();
+            if (!vod.isEmpty()) return vod;
+        }
         Config live = Config.live();
         return live.isEmpty() ? Config.vod() : live;
     }

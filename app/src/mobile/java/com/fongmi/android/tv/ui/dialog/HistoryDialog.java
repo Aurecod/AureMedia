@@ -142,7 +142,15 @@ public class HistoryDialog extends BaseAlertDialog implements ConfigAdapter.OnCl
 
     @Override
     public void onTextClick(Config item) {
-        listener.setConfig(item);
+        if (type == 1 && adapter.isFollowVodItem(item)) {
+            // ★ 点"跟随点播源"→ 开显式 flag + 用点播订阅的 lives（对标 QussMedia onFollowClick）
+            LiveConfig.setFollowVod(true);
+            Config vod = Config.vod();
+            listener.setConfig(vod.isEmpty() ? Config.live() : vod);
+        } else {
+            if (type == 1) LiveConfig.setFollowVod(false);   // 选具体直播订阅 → 关跟随
+            listener.setConfig(item);
+        }
         dismiss();
     }
 

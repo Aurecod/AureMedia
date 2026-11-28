@@ -89,7 +89,7 @@ public class SettingFragment extends BaseFragment implements ConfigListener, Sit
     protected void initView() {
         EventBus.getDefault().register(this);
         mBinding.vodUrl.setText(VodConfig.getDesc());
-        mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.liveUrl.setText(LiveConfig.isFollowVod() ? "跟随点播" : LiveConfig.getDesc());
         setWallText();
         mBinding.versionText.setText(AppVersion.fullName());
         setOtherText();
@@ -172,7 +172,10 @@ public class SettingFragment extends BaseFragment implements ConfigListener, Sit
             case 0:
                 String previousVodUrl = VodConfig.getUrl();
                 VodConfig.load(config, getCallback());
-                if (ConfigSyncPolicy.shouldSyncLive(previousVodUrl, LiveConfig.getUrl())) {
+                // ★ 跟随点播开启时：点播订阅切换 → 直播直接用新点播订阅的 lives（对标 QussMedia activeConfig）
+                if (LiveConfig.isFollowVod()) {
+                    LiveConfig.load(config, new Callback());
+                } else if (ConfigSyncPolicy.shouldSyncLive(previousVodUrl, LiveConfig.getUrl())) {
                     Config liveConfig = AppDatabase.get().getConfigDao().find(config.getUrl(), 1);
                     if (liveConfig != null) LiveConfig.load(liveConfig, new Callback());
                 }
@@ -420,7 +423,7 @@ public class SettingFragment extends BaseFragment implements ConfigListener, Sit
         }
         if (event.type() != ConfigEvent.Type.COMMON) return;
         mBinding.vodUrl.setText(VodConfig.getDesc());
-        mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.liveUrl.setText(LiveConfig.isFollowVod() ? "跟随点播" : LiveConfig.getDesc());
         setWallText();
     }
 
