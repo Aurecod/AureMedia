@@ -231,9 +231,6 @@ jobs:
       matrix:
         variant:
           - MobileArm64_v8a
-          - MobileArmeabi_v7a
-          - LeanbackArm64_v8a
-          - LeanbackArmeabi_v7a
 
     env:
       WEBHTV_RELEASE_TAG: ${{ needs.meta.outputs.tag }}
