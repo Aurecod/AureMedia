@@ -10,6 +10,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivityMusicBinding;
+import com.fongmi.android.tv.music.MusicSong;
 import com.fongmi.android.tv.music.ui.MusicHomeFragment;
 import com.fongmi.android.tv.music.ui.MusicLibFragment;
 import com.fongmi.android.tv.music.ui.MusicPlayer;
@@ -40,7 +41,14 @@ public class MusicActivity extends BaseActivity {
         // 迷你播放条：播放/暂停切换 + 显示当前歌曲 + 点击展开播放页
         mBinding.musicMiniPlay.setOnClickListener(v -> MusicPlayer.get().togglePlay());
         mBinding.musicMini.setOnClickListener(v -> startActivity(new Intent(this, MusicPlayActivity.class)));
-        MusicPlayer.get().setListener((song, playing) -> runOnUiThread(() -> updateMini(song, playing)));
+        MusicPlayer.get().setListener(new MusicPlayer.Listener() {
+            @Override
+            public void onSongChanged(MusicSong song, boolean playing) {
+                runOnUiThread(() -> updateMini(song, playing));
+            }
+            @Override
+            public void onProgress(long posMs, long durMs) { }
+        });
         updateMini(MusicPlayer.get().currentSong(), MusicPlayer.get().isPlaying());
 
         applyTheme();
