@@ -41,6 +41,19 @@ public class MusicHomeFragment extends Fragment {
         mPlatformBtn = view.findViewById(R.id.musicPlatformBtn);
         updatePlatformBtn();
         mPlatformBtn.setOnClickListener(v -> showPlatformMenu(v));
+        // 悬浮按钮 + 内容容器避过状态栏（edge-to-edge）
+        if (getView() != null) {
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(getView(), (v, insets) -> {
+                int sb = insets.getInsets(androidx.core.graphics.Insets.Type.statusBars()).top;
+                android.view.ViewGroup.MarginLayoutParams lp = (android.view.ViewGroup.MarginLayoutParams) mPlatformBtn.getLayoutParams();
+                lp.topMargin = sb + dp(8);
+                mPlatformBtn.setLayoutParams(lp);
+                // 内容容器顶部 padding = 状态栏 + 按钮区
+                android.view.View sv = v.findViewById(R.id.musicHomeScroll);
+                if (sv != null) sv.setPadding(0, sb + dp(48), 0, 0);
+                return insets;
+            });
+        }
         loadAll();
         return view;
     }
