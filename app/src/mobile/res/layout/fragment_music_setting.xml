@@ -124,5 +124,13 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <!-- seg 行容器（音质/外观/歌词等，对标 set-row） -->
+        <LinearLayout
+            android:id="@+id/settingRows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

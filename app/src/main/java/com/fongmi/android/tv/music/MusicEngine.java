@@ -72,6 +72,23 @@ public class MusicEngine {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY_PLATFORM, platform).apply();
     }
 
+    /** 通用设置读写（音质/外观/歌词等偏好） */
+    public static String getStr(Context ctx, String key, String def) {
+        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(key, def);
+    }
+
+    public static void setStr(Context ctx, String key, String val) {
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(key, val).apply();
+    }
+
+    public static boolean getBool(Context ctx, String key, boolean def) {
+        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(key, def);
+    }
+
+    public static void setBool(Context ctx, String key, boolean val) {
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(key, val).apply();
+    }
+
     /** 当前 active 音源 id（音源决定支持平台） */
     public static String getSource(Context ctx) {
         return MusicSourceStore.getActive(ctx).id;
