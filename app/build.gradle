@@ -19,7 +19,7 @@ def apkSuffix = (System.getenv('WEBHTV_APK_SUFFIX') ?: '').replaceAll('[^A-Za-z0
 def buildSuffix = (System.getenv('WEBHTV_BUILD_SUFFIX') ?: '').replaceAll('[^A-Za-z0-9._-]', '')
 def versionBase = "1.0.9"
 // ★ build 计数：同版本每次 build +1（CI build 模式递增写回）。关于页以 build⁺N 上标显示。
-def buildSeq = 4
+def buildSeq = 5
 def gitRevision = 'unavailable'
 def gitState = 'unavailable'
 def mpvSourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('third_party/mpv-native-lock.json'))
