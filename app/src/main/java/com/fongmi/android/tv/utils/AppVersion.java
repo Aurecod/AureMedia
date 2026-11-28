@@ -22,7 +22,7 @@ public final class AppVersion {
 
     public static String fullName() {
         String tag = BuildConfig.BUILD_TAG == null ? "" : BuildConfig.BUILD_TAG.trim();
-        if (tag.isEmpty()) tag = BuildConfig.VERSION_NAME + "-" + BuildConfig.BUILD_TIME;
+        if (tag.isEmpty()) tag = BuildConfig.VERSION_NAME;
         return stripPrefix(tag);
     }
 

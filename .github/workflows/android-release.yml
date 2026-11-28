@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Release tag, blank = v<versionName>-yyyyMMddHHmm or v<versionName>-beta-yyyyMMddHHmm"
+        description: "Release tag, blank = v<versionName> or v<versionName>-beta"
         required: false
         type: string
       release_channel:
@@ -121,18 +121,16 @@ jobs:
               CHANNEL="stable"
             fi
           fi
-          COMMIT_EPOCH="$(git show -s --format=%ct "$GITHUB_SHA")"
-          TAG_TIME="$(date -d "@$COMMIT_EPOCH" +%Y%m%d%H%M)"
           if [ "$CHANNEL" = "beta" ]; then
             APK_SUFFIX="-beta"
-            TAG_PATTERN="^v${VERSION_NAME}-beta-[0-9]{12}$"
-            TAG_DEFAULT="v${VERSION_NAME}-beta-$TAG_TIME"
-            TAG_EXPECT="v${VERSION_NAME}-beta-yyyyMMddHHmm"
+            TAG_PATTERN="^v${VERSION_NAME}-beta$"
+            TAG_DEFAULT="v${VERSION_NAME}-beta"
+            TAG_EXPECT="v${VERSION_NAME}-beta"
           else
             APK_SUFFIX=""
-            TAG_PATTERN="^v${VERSION_NAME}-[0-9]{12}$"
-            TAG_DEFAULT="v${VERSION_NAME}-$TAG_TIME"
-            TAG_EXPECT="v${VERSION_NAME}-yyyyMMddHHmm"
+            TAG_PATTERN="^v${VERSION_NAME}$"
+            TAG_DEFAULT="v${VERSION_NAME}"
+            TAG_EXPECT="v${VERSION_NAME}"
           fi
           TAG="${{ inputs.release_tag }}"
           if [ -z "$TAG" ]; then
@@ -532,11 +530,11 @@ jobs:
 
           if [ "${{ needs.meta.outputs.channel }}" = "stable" ]; then
             OTHER_TAG="$(gh release list --limit 100 --json tagName,isDraft,isPrerelease \
-              --jq '[.[] | select((.isDraft == false) and (.isPrerelease == true) and (.tagName | test("-beta-[0-9]{12}$")))] | first | .tagName // ""')"
+              --jq '[.[] | select((.isDraft == false) and (.isPrerelease == true) and (.tagName | test("-beta$")))] | first | .tagName // ""')"
             OTHER_PATTERN="*-beta.json"
           else
             OTHER_TAG="$(gh release list --limit 100 --json tagName,isDraft,isPrerelease \
-              --jq '[.[] | select((.isDraft == false) and (.isPrerelease == false) and (.tagName | test("^v.+-[0-9]{12}$")))] | first | .tagName // ""')"
+              --jq '[.[] | select((.isDraft == false) and (.isPrerelease == false) and (.tagName | test("^v.+-[0-9]{12}$|^v[0-9]+\.[0-9]+\.[0-9]+$")))] | first | .tagName // ""')"
             OTHER_PATTERN="*.json"
           fi
 
