@@ -31,6 +31,7 @@ public class MusicHomeFragment extends Fragment {
 
     private LinearLayout mContent;
     private TextView mPlatformBtn;
+    private boolean mAutoPlayed; // 本次页面已自动播放（防重复）
 
     @Nullable
     @Override
@@ -75,12 +76,23 @@ public class MusicHomeFragment extends Fragment {
                         // 精品榜单（grid 3列）
                         addSectionTitle("精品榜单");
                         addGridCards(ranks);
+                        // 自动播放（读设置，非关闭则播热门第一首）
+                        autoPlay(hot);
                     });
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    /** 自动播放：读"自动播放"设置，非关闭则播热门第一首（首次进入） */
+    private void autoPlay(List<MusicSong> hot) {
+        String mode = MusicEngine.getStr(getContext(), "自动播放", "关闭");
+        if ("关闭".equals(mode) || hot == null || hot.isEmpty()) return;
+        if (mAutoPlayed) return;
+        mAutoPlayed = true;
+        MusicPlayer.get().play(getContext(), hot.get(0), hot, 0);
     }
 
     /** 板块标题 */

@@ -22,6 +22,7 @@ public class MusicPlayer {
     private boolean mPlaying;
     private final java.util.List<MusicSong> mQueue = new java.util.ArrayList<>();
     private int mQueueIndex = -1;
+    private boolean mDegraded;    // 本次播放已降级（避免无限循环）
     private Context mCtx;
     private long mPositionMs;      // 缓存位置（歌词同步用）
 
@@ -46,6 +47,7 @@ public class MusicPlayer {
     public void play(Context ctx, MusicSong song, java.util.List<MusicSong> queue, int index) {
         if (song == null) return;
         mCtx = ctx;
+        mDegraded = false; // 新播放重置降级标记
         if (mPlayer == null) {
             mPlayer = new ExoPlayer.Builder(ctx).build();
             mPlayer.addListener(new Player.Listener() {
@@ -62,6 +64,22 @@ public class MusicPlayer {
                             next();
                         }
                     }
+                }
+                @Override
+                public void onPlayerError(androidx.media3.common.PlaybackException e) {
+                    // 音质自动降级：播放失败且音质>标准，降档重试一次
+                    boolean autoDown = MusicEngine.getBool(mCtx, "音质自动降级", true);
+                    if (autoDown && !mDegraded) {
+                        String q = MusicEngine.getStr(mCtx, "音质", "无损");
+                        String lower = MusicEngine.lowerQuality(q);
+                        if (lower != null) {
+                            mDegraded = true;
+                            MusicEngine.setStr(mCtx, "音质", lower);
+                            retryCurrent();
+                            return;
+                        }
+                    }
+                    mDegraded = false;
                 }
             });
         }
@@ -86,6 +104,25 @@ public class MusicPlayer {
                 .setMediaMetadata(new MediaMetadata.Builder()
                         .setTitle(song.name)
                         .setArtist(song.singer)
+                        .build())
+                .build();
+        mPlayer.setMediaItem(item);
+        mPlayer.prepare();
+        mPlayer.play();
+        mPlaying = true;
+        notifyChange();
+    }
+
+    /** 音质降档后重播当前歌曲 */
+    private void retryCurrent() {
+        if (mCtx == null || mSong == null) return;
+        String url = MusicEngine.resolveUrl(mCtx, mSong);
+        if (url == null) return;
+        MediaItem item = new MediaItem.Builder()
+                .setUri(url)
+                .setMediaMetadata(new MediaMetadata.Builder()
+                        .setTitle(mSong.name)
+                        .setArtist(mSong.singer)
                         .build())
                 .build();
         mPlayer.setMediaItem(item);

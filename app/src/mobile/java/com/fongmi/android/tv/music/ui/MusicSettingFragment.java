@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.music.ui;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,7 +26,9 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.music.MusicEngine;
 import com.fongmi.android.tv.music.MusicSource;
 import com.fongmi.android.tv.music.MusicSourceStore;
+import com.fongmi.android.tv.utils.FileChooser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +39,20 @@ public class MusicSettingFragment extends Fragment {
     private EditText mSrcName;
     private EditText mSrcJsUrl;
     private final List<CheckBox> mPlatChecks = new ArrayList<>();
+    private String mEditingId; // 编辑中的音源 id（null=新增）
+
+    /** 本地文件选择（对标点播 ConfigDialog：FileChooser 选 .js → 读路径 → 导入） */
+    private final ActivityResultLauncher<Intent> fileLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null
+                        || result.getData().getData() == null) return;
+                String path = FileChooser.getPersistentPathFromUri(result.getData().getData());
+                if (path == null || path.isEmpty()) {
+                    Toast.makeText(getContext(), "无法读取所选文件", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                importLocalFile(path);
+            });
 
     @Nullable
     @Override
@@ -45,7 +65,10 @@ public class MusicSettingFragment extends Fragment {
 
         buildPlatformChecks();
         view.findViewById(R.id.btnSrcAdd).setOnClickListener(v -> importOnline());
-        view.findViewById(R.id.btnSrcLocal).setOnClickListener(v -> Toast.makeText(getContext(), "本地文件：请将 .js 音源放入 存储/AureCod/music/", Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.btnSrcLocal).setOnClickListener(v -> {
+            // 对标点播：文件选择器选 .js 音源文件
+            FileChooser.from(fileLauncher).show();
+        });
 
         renderSourceList();
         buildSettingRows(view.findViewById(R.id.settingRows));
@@ -239,8 +262,25 @@ public class MusicSettingFragment extends Fragment {
         plats.setTextColor(0xFF8A8F99);
         main.addView(plats);
 
-        // 删除按钮（内置不可删）
+        // 编辑 + 删除按钮（内置不可删）
         if (!s.builtin) {
+            TextView edit = new TextView(getContext());
+            edit.setText("编辑");
+            edit.setTextSize(12);
+            edit.setTextColor(0xFF3B82F6);
+            edit.setPadding(8, 8, 8, 8);
+            edit.setOnClickListener(v -> {
+                mSrcName.setText(s.name);
+                mSrcJsUrl.setText(s.link != null && s.link.startsWith("file:") ? "" : (s.link == null ? "" : s.link));
+                // 勾选该音源支持的平台
+                for (int i = 0; i < mPlatChecks.size(); i++) {
+                    mPlatChecks.get(i).setChecked(s.supports(MusicEngine.platforms()[i]));
+                }
+                mEditingId = s.id;
+                Toast.makeText(getContext(), "编辑音源：" + s.name + "（修改后点在线导入保存）", Toast.LENGTH_SHORT).show();
+            });
+            card.addView(edit);
+
             TextView del = new TextView(getContext());
             del.setText("删除");
             del.setTextSize(12);
@@ -248,6 +288,7 @@ public class MusicSettingFragment extends Fragment {
             del.setPadding(14, 8, 8, 8);
             del.setOnClickListener(v -> {
                 MusicSourceStore.removeSource(getContext(), s.id);
+                if (s.id.equals(mEditingId)) mEditingId = null;
                 renderSourceList();
             });
             card.addView(del);
@@ -263,6 +304,24 @@ public class MusicSettingFragment extends Fragment {
     }
 
     /** 在线导入：校验名称 + URL，添加音源 */
+    /** 导入本地 .js 音源（对标点播：读取本地文件，文件名作名称，file:// 路径作 link） */
+    private void importLocalFile(String path) {
+        if (getContext() == null) return;
+        String name = new File(path).getName().replaceAll("\\.js$", "");
+        if (name.isEmpty()) name = "本地音源";
+        List<String> plats = new ArrayList<>();
+        String[] platsArr = MusicEngine.platforms();
+        for (int i = 0; i < mPlatChecks.size(); i++) {
+            if (mPlatChecks.get(i).isChecked()) plats.add(platsArr[i]);
+        }
+        if (plats.isEmpty()) plats.add(MusicEngine.PLATFORM_NETEASE);
+        // 对标点播：file:/path 本地 URL
+        String url = "file:/" + path.replace(com.github.catvod.utils.Path.rootPath(), "");
+        MusicSourceStore.addSource(getContext(), name, "js", url, plats);
+        renderSourceList();
+        Toast.makeText(getContext(), "已导入本地音源：" + name, Toast.LENGTH_SHORT).show();
+    }
+
     private void importOnline() {
         if (getContext() == null) return;
         String name = mSrcName.getText().toString().trim();
@@ -281,6 +340,16 @@ public class MusicSettingFragment extends Fragment {
             return;
         }
         String type = url.startsWith("http") ? "js" : "api";
+        if (mEditingId != null) {
+            // 编辑现有音源
+            MusicSourceStore.updateSource(getContext(), mEditingId, name, type, url, plats);
+            mEditingId = null;
+            mSrcName.setText("");
+            mSrcJsUrl.setText("");
+            renderSourceList();
+            Toast.makeText(getContext(), "已保存音源：" + name, Toast.LENGTH_SHORT).show();
+            return;
+        }
         MusicSourceStore.addSource(getContext(), name, type, url, plats);
         mSrcName.setText("");
         mSrcJsUrl.setText("");

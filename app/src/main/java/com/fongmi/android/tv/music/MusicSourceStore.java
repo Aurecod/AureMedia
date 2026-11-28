@@ -89,6 +89,21 @@ public class MusicSourceStore {
         if (getActive(ctx).id.equals(id)) setActive(ctx, kept.get(0).id);
     }
 
+    /** 编辑音源（名称/类型/链接/平台） */
+    public static void updateSource(Context ctx, String id, String name, String type, String link, List<String> platforms) {
+        List<MusicSource> all = getSources(ctx);
+        for (MusicSource s : all) {
+            if (s.id.equals(id)) {
+                s.name = name;
+                s.type = type;
+                s.link = link;
+                s.platforms = platforms.toArray(new String[0]);
+                break;
+            }
+        }
+        saveSources(ctx, all);
+    }
+
     private static List<MusicSource> builtins() {
         List<MusicSource> list = new ArrayList<>();
         for (String[] b : BUILTIN) {

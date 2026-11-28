@@ -45,8 +45,8 @@ public class MusicPlayActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState); // BaseActivity 状态栏 edge-to-edge
 
-        mBinding.npClose.setOnClickListener(v -> finish());
-        mBinding.npPlay.setOnClickListener(v -> {
+        applyPlayStyle();
+        mBinding.npClose.setOnClickListener(v -> finish());        mBinding.npPlay.setOnClickListener(v -> {
             MusicPlayer.get().togglePlay();
             updatePlayBtn();
         });
@@ -71,6 +71,29 @@ public class MusicPlayActivity extends BaseActivity {
             bindSong(song);
             loadLyric(song);
         }
+    }
+
+    /** 播放页样式：经典(暗色)/沉浸(深色渐变)，读"播放页样式"设置 */
+    private void applyPlayStyle() {
+        String style = MusicEngine.getStr(this, "播放页样式", "经典");
+        boolean dark = MusicEngine.isDarkTheme(this);
+        if ("沉浸".equals(style)) {
+            mBinding.npBg.setBackgroundColor(0xFF000000);
+            mBinding.npTitle.setTextColor(0xFFFFFFFF);
+            mBinding.npSinger.setTextColor(0xFFB0B4BE);
+        } else {
+            mBinding.npBg.setBackgroundColor(dark ? 0xFF12141A : 0xFFF2F3F5);
+            mBinding.npTitle.setTextColor(dark ? 0xFFFFFFFF : 0xFF12141A);
+            mBinding.npSinger.setTextColor(dark ? 0xFF8A8F99 : 0xFF606770);
+        }
+        // 进度条样式：普通(蓝)/心率(红)/星轨(紫)
+        String seek = MusicEngine.getStr(this, "进度条样式", "星轨");
+        int seekColor;
+        if ("心率".equals(seek)) seekColor = 0xFFE05555;
+        else if ("星轨".equals(seek)) seekColor = 0xFF8B5CF6;
+        else seekColor = 0xFF3B82F6;
+        mBinding.npSeek.getProgressDrawable().setColorFilter(seekColor, android.graphics.PorterDuff.Mode.SRC_IN);
+        mBinding.npSeek.getThumb().setColorFilter(seekColor, android.graphics.PorterDuff.Mode.SRC_IN);
     }
 
     private void bindSong(MusicSong s) {
@@ -99,9 +122,14 @@ public class MusicPlayActivity extends BaseActivity {
                     return;
                 }
                 mBinding.npLyricTitle.setText("歌词");
+                boolean showTrans = MusicEngine.getBool(this, "显示翻译行", true);
                 for (int i = 0; i < lines.size(); i++) {
                     TextView tv = new TextView(this);
-                    tv.setText(lines.get(i).text);
+                    String txt = lines.get(i).text;
+                    if (showTrans && lines.get(i).trans != null && !lines.get(i).trans.isEmpty()) {
+                        txt += "  " + lines.get(i).trans;
+                    }
+                    tv.setText(txt);
                     tv.setTextSize(13);
                     tv.setPadding(dp(4), dp(6), dp(4), dp(6));
                     tv.setTextColor(0xFF8A8F99);
@@ -115,6 +143,11 @@ public class MusicPlayActivity extends BaseActivity {
     private void updateLyric() {
         if (mLyrics.isEmpty()) return;
         long pos = MusicPlayer.get().getPosition();
+        // 歌词偏移（秒，可负）
+        try {
+            String off = MusicEngine.getStr(this, "歌词偏移", "0");
+            if (off != null && !off.isEmpty()) pos += (long) (Double.parseDouble(off) * 1000);
+        } catch (NumberFormatException ignored) { }
         int idx = -1;
         for (int i = 0; i < mLyrics.size(); i++) {
             if (mLyrics.get(i).time <= pos) idx = i;

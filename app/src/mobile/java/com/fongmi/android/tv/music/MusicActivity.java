@@ -2,6 +2,7 @@ package com.fongmi.android.tv.music;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -42,7 +43,34 @@ public class MusicActivity extends BaseActivity {
         MusicPlayer.get().setListener((song, playing) -> runOnUiThread(() -> updateMini(song, playing)));
         updateMini(MusicPlayer.get().currentSong(), MusicPlayer.get().isPlaying());
 
+        applyTheme();
+        applyFullscreen();
         switchTab(0);
+    }
+
+    /** 首页全屏：隐藏迷你播放条 + 底部 tab（仅首页生效，读"首页全屏"设置） */
+    private void applyFullscreen() {
+        boolean fs = MusicEngine.getBool(this, "首页全屏", true);
+        int vis = fs ? View.GONE : View.VISIBLE;
+        mBinding.musicMini.setVisibility(fs && MusicPlayer.get().currentSong() != null ? View.VISIBLE : View.GONE);
+        mBinding.musicTabHome.setVisibility(vis);
+        mBinding.musicTabLib.setVisibility(vis);
+        mBinding.musicTabSearch.setVisibility(vis);
+        mBinding.musicTabSetting.setVisibility(vis);
+    }
+
+    /** 应用外观设置（背景色 + 主题色文字） */
+    private void applyTheme() {
+        boolean dark = MusicEngine.isDarkTheme(this);
+        int bg = dark ? 0xFF12141A : 0xFFF2F3F5;
+        int text = dark ? 0xFFFFFFFF : 0xFF12141A;
+        int sub = dark ? 0xFF8A8F99 : 0xFF606770;
+        mBinding.getRoot().setBackgroundColor(bg);
+        // 底部 tab 背景 + 文字
+        mBinding.musicTabHome.setTextColor(text);
+        mBinding.musicTabLib.setTextColor(sub);
+        mBinding.musicTabSearch.setTextColor(sub);
+        mBinding.musicTabSetting.setTextColor(sub);
     }
 
     /** 更新迷你播放条 */
