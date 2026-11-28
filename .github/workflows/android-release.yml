@@ -36,10 +36,15 @@ on:
         default: false
         type: boolean
       bump_version:
-        description: "Auto-increment version (third segment, 100-base: 0-99 -> carry to minor) and commit before release"
+        description: "Auto-increment version (third segment, 100-base: 0-99 -> carry to minor) after a successful release"
         required: false
         default: true
         type: boolean
+      build_mode:
+        description: "build = dev APK with -build suffix (no release), release = clean version + publish + bump after success"
+        required: false
+        default: release
+        type: string
       sync_cnb:
         description: "Optionally mirror APKs to CNB Release and sync CNB manifests"
         required: false
@@ -79,6 +84,7 @@ jobs:
       short_sha: ${{ steps.meta.outputs.short_sha }}
       channel: ${{ steps.meta.outputs.channel }}
       apk_suffix: ${{ steps.meta.outputs.apk_suffix }}
+      build_suffix: ${{ steps.meta.outputs.build_suffix }}
 
     steps:
       - name: Checkout
@@ -86,33 +92,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Bump version (100-base, optional)
-        id: bump
-        run: |
-          if [ "${{ inputs.bump_version }}" != "true" ]; then
-            echo "bumped=false" >> "$GITHUB_OUTPUT"
-            echo "Version bump skipped"
-            exit 0
-          fi
-          NEW_VER="$(bash scripts/bump_version.sh --apply)"
-          echo "bumped=true" >> "$GITHUB_OUTPUT"
-          echo "new_version=$NEW_VER" >> "$GITHUB_OUTPUT"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/build.gradle
-          git commit -m "chore(release): bump version to $NEW_VER" || echo "no version change to commit"
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          if [ "$BRANCH" = "$GITHUB_REF" ]; then
-            echo "Cannot push: not on a branch (ref=$GITHUB_REF)" >&2
-            exit 0
-          fi
-          git push origin "HEAD:refs/heads/$BRANCH"
-
       - name: Resolve release tag
         id: meta
         run: |
-          VERSION_NAME="$(sed -n 's/^[[:space:]]*versionName[[:space:]]*"\([^"]*\)".*/\1/p' app/build.gradle | head -1)"
+          VERSION_NAME="$(sed -n 's/^[[:space:]]*def versionBase[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' app/build.gradle | head -1)"
           VERSION_CODE="$(sed -n 's/^[[:space:]]*versionCode[[:space:]]*\([0-9][0-9]*\).*/\1/p' app/build.gradle | head -1)"
+          BUILD_MODE="${{ inputs.build_mode }}"
+          if [ "$BUILD_MODE" != "build" ]; then
+            BUILD_MODE="release"
+          fi
+          if [ "$BUILD_MODE" = "build" ]; then
+            BUILD_SUFFIX="build"
+            APK_SUFFIX="-build"
+          else
+            BUILD_SUFFIX=""
+          fi
           CHANNEL="${{ inputs.release_channel }}"
           if [ "$CHANNEL" = "auto" ] || [ -z "$CHANNEL" ]; then
             if [ "${{ github.ref_name }}" = "dev" ] || [ "${{ github.ref_name }}" = "fongmi-sync" ]; then
@@ -122,12 +116,20 @@ jobs:
             fi
           fi
           if [ "$CHANNEL" = "beta" ]; then
-            APK_SUFFIX="-beta"
+            if [ "$BUILD_MODE" = "build" ]; then
+              APK_SUFFIX="-build"
+            else
+              APK_SUFFIX="-beta"
+            fi
             TAG_PATTERN="^v${VERSION_NAME}-beta$"
             TAG_DEFAULT="v${VERSION_NAME}-beta"
             TAG_EXPECT="v${VERSION_NAME}-beta"
           else
-            APK_SUFFIX=""
+            if [ "$BUILD_MODE" = "build" ]; then
+              APK_SUFFIX="-build"
+            else
+              APK_SUFFIX=""
+            fi
             TAG_PATTERN="^v${VERSION_NAME}$"
             TAG_DEFAULT="v${VERSION_NAME}"
             TAG_EXPECT="v${VERSION_NAME}"
@@ -155,6 +157,7 @@ jobs:
             echo "short_sha=$(git rev-parse --short=7 HEAD)"
             echo "channel=$CHANNEL"
             echo "apk_suffix=$APK_SUFFIX"
+            echo "build_suffix=$BUILD_SUFFIX"
           } >> "$GITHUB_OUTPUT"
 
   test:
@@ -233,6 +236,7 @@ jobs:
     env:
       WEBHTV_RELEASE_TAG: ${{ needs.meta.outputs.tag }}
       WEBHTV_APK_SUFFIX: ${{ needs.meta.outputs.apk_suffix }}
+      WEBHTV_BUILD_SUFFIX: ${{ needs.meta.outputs.build_suffix }}
 
     steps:
       - name: Checkout
@@ -580,3 +584,21 @@ jobs:
           path: dist/*
           if-no-files-found: error
           retention-days: 30
+
+      - name: Bump version after successful release
+        if: ${{ inputs.bump_version == 'true' && inputs.build_mode != 'build' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          NEW_VER="$(bash scripts/bump_version.sh --apply)"
+          git add app/build.gradle
+          git commit -m "chore(release): bump version to $NEW_VER" || echo "no version change to commit"
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if [ "$BRANCH" = "$GITHUB_REF" ]; then
+            echo "Cannot push: not on a branch (ref=$GITHUB_REF)" >&2
+            exit 0
+          fi
+          git push origin "HEAD:refs/heads/$BRANCH"
+          echo "Bumped version to $NEW_VER after successful release"

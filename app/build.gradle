@@ -16,6 +16,8 @@ def buildTimestamp = new Date().format('yyyyMMddHHmm', TimeZone.getTimeZone('Asi
 def buildTime = fastRelease ? "fast-${buildTimestamp}" : buildTimestamp
 def releaseTag = (System.getenv('WEBHTV_RELEASE_TAG') ?: '').replace('\\', '\\\\').replace('"', '\\"')
 def apkSuffix = (System.getenv('WEBHTV_APK_SUFFIX') ?: '').replaceAll('[^A-Za-z0-9._-]', '')
+def buildSuffix = (System.getenv('WEBHTV_BUILD_SUFFIX') ?: '').replaceAll('[^A-Za-z0-9._-]', '')
+def versionBase = "1.0.4"
 def gitRevision = 'unavailable'
 def gitState = 'unavailable'
 def mpvSourceLock = new groovy.json.JsonSlurper().parse(rootProject.file('third_party/mpv-native-lock.json'))
@@ -39,7 +41,7 @@ android {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
         versionCode 10004
-        versionName "1.0.4"
+        versionName versionBase + (buildSuffix ? "-$buildSuffix" : "")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         buildConfigField "String", "BUILD_TAG", "\"${releaseTag}\""

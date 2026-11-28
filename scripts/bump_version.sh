@@ -21,10 +21,10 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-VN="$(sed -n 's/^[[:space:]]*versionName[[:space:]]*"\([^"]*\)".*/\1/p' "$GRADLE" | head -1)"
+VN="$(sed -n 's/^[[:space:]]*def versionBase[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$GRADLE" | head -1)"
 VC="$(sed -n 's/^[[:space:]]*versionCode[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$GRADLE" | head -1)"
 if [ -z "$VN" ]; then
-  echo "ERROR: cannot read versionName from $GRADLE" >&2
+  echo "ERROR: cannot read versionBase from $GRADLE" >&2
   exit 1
 fi
 
@@ -56,10 +56,10 @@ echo "old=${VN} (code ${VC:-?}) new=${NEW_VN} (code ${NEW_VC})" >&2
 
 if [ "$APPLY" -eq 1 ]; then
   sed -i \
-    -e "s/^\([[:space:]]*versionName[[:space:]]*\)\"[^\"]*\"/\1\"$NEW_VN\"/" \
+    -e "s/^\([[:space:]]*def versionBase[[:space:]]*=[[:space:]]*\)\"[^\"]*\"/\1\"$NEW_VN\"/" \
     -e "s/^\([[:space:]]*versionCode[[:space:]]*\)[0-9][0-9]*/\1$NEW_VC/" \
     "$GRADLE"
-  echo "written: versionName=$NEW_VN versionCode=$NEW_VC" >&2
+  echo "written: versionBase=$NEW_VN versionCode=$NEW_VC" >&2
 fi
 
 echo "$NEW_VN"
