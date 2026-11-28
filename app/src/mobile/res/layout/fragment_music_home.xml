@@ -4,14 +4,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/musicHomeHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="主页"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold" />
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="主页"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/musicPlatformBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:background="@drawable/bg_platform_pill"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="网易 ▾"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
+
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/musicHomeList"
