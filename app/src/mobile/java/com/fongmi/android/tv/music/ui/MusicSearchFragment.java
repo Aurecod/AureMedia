@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.music.MusicEngine;
 import com.fongmi.android.tv.music.MusicSong;
-import com.fongmi.android.tv.music.QqMusicApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,8 @@ public class MusicSearchFragment extends Fragment {
         if (kw.isEmpty()) return;
         new Thread(() -> {
             try {
-                List<MusicSong> songs = QqMusicApi.search(kw);
+                // 音源驱动：当前平台搜索
+                List<MusicSong> songs = MusicEngine.search(getContext(), kw);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         List<Object> items = new ArrayList<>();

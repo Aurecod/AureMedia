@@ -4,11 +4,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.music.MusicEngine;
 import com.fongmi.android.tv.music.MusicSong;
 
 import java.util.ArrayList;
@@ -18,6 +20,11 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
 
     private final List<Object> mItems = new ArrayList<>();
     private static final int TYPE_HEADER = 0, TYPE_SONG = 1;
+    private MusicPlayer mPlayer;
+
+    public MusicHomeAdapter() {
+        mPlayer = new MusicPlayer();
+    }
 
     public void setItems(List<Object> items) {
         mItems.clear();
@@ -45,9 +52,20 @@ public class MusicHomeAdapter extends RecyclerView.Adapter<MusicHomeAdapter.VH> 
             MusicSong s = (MusicSong) item;
             holder.title.setText(s.name);
             holder.subtitle.setText(s.singer);
+            holder.itemView.setOnClickListener(v -> playSong(holder.itemView, s));
         } else {
             holder.title.setText((String) item);
         }
+    }
+
+    private void playSong(View v, MusicSong s) {
+        String url = MusicEngine.resolveUrl(v.getContext(), s);
+        if (url == null) {
+            Toast.makeText(v.getContext(), s.source + " 平台播放受限（需登录/VIP），可切换到网易", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(v.getContext(), "播放：" + s.name, Toast.LENGTH_SHORT).show();
+        mPlayer.play(v.getContext(), s.name, url);
     }
 
     @Override

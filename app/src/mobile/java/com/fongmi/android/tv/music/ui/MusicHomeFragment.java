@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.music.QqMusicApi;
+import com.fongmi.android.tv.music.MusicEngine;
 import com.fongmi.android.tv.music.MusicSong;
 
 import java.util.ArrayList;
@@ -36,15 +36,15 @@ public class MusicHomeFragment extends Fragment {
     }
 
     private void loadHome() {
-        // 异步加载热榜
+        // 异步加载当前平台热榜（音源驱动）
         new Thread(() -> {
             try {
-                List<MusicSong> songs = QqMusicApi.playlist(QqMusicApi.HOT_PLAYLISTS[1]); // 热歌榜 (topId=63)
+                List<MusicSong> songs = MusicEngine.hot(getContext());
                 if (songs != null && !songs.isEmpty() && getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         List<Object> items = new ArrayList<>();
-                        items.add("为你推荐"); // 板块标题
-                        items.addAll(songs.subList(0, Math.min(10, songs.size())));
+                        items.add("热门歌曲"); // 板块标题
+                        items.addAll(songs.subList(0, Math.min(20, songs.size())));
                         mAdapter.setItems(items);
                     });
                 }
