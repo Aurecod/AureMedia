@@ -37,6 +37,20 @@ public class MusicEngine {
             PLATFORM_QQ, PLATFORM_NETEASE, PLATFORM_KUWO, PLATFORM_KUGOU, PLATFORM_MIGU
     };
 
+    /** 各平台官方色（am-4u2 accent） */
+    public static int platformColor(String platform) {
+        switch (platform) {
+            case PLATFORM_QQ: return 0xFF31C27C;    // 绿
+            case PLATFORM_NETEASE: return 0xFFEC4141; // 红
+            case PLATFORM_KUWO: return 0xFFFF6A00;  // 橙
+            case PLATFORM_KUGOU: return 0xFF2CA2F9; // 蓝
+            case PLATFORM_MIGU: return 0xFFED4141;  // 红
+            default: return 0xFFE84393;             // 粉(默认/主色)
+        }
+    }
+    /** 主色（am-4u2 --pink） */
+    public static int accentColor() { return 0xFFE84393; }
+
     public static final String[] PLATFORM_NAMES = {
             "QQ", "网易", "酷我", "酷狗", "咪咕"
     };

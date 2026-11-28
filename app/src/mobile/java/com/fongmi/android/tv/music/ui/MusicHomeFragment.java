@@ -51,6 +51,8 @@ public class MusicHomeFragment extends Fragment {
         String platform = MusicEngine.getPlatform(getContext());
         int idx = MusicEngine.platformIndex(platform);
         mPlatformBtn.setText(MusicEngine.platformNames()[idx] + " ▾");
+        // 平台按钮用平台官方色（am-4u2 accent）
+        mPlatformBtn.setBackgroundColor(MusicEngine.platformColor(platform));
     }
 
     /** 加载全部板块 */
@@ -96,11 +98,16 @@ public class MusicHomeFragment extends Fragment {
     }
 
     /** 板块标题 */
+    /** 卡片背景色（按主题） */
+    private int cardBg() {
+        return MusicEngine.isDarkTheme(getContext()) ? 0xFF2A2E37 : 0xFFF0F1F4;
+    }
+
     private void addSectionTitle(String title) {
         TextView tv = new TextView(getContext());
         tv.setText(title);
         tv.setTextSize(16);
-        tv.setTextColor(0xFFFFFFFF);
+        tv.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFFFFFFFF : 0xFF1C1C1E);
         tv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         tv.setPadding(dp(16), dp(18), dp(16), dp(8));
         mContent.addView(tv);
@@ -147,7 +154,7 @@ public class MusicHomeFragment extends Fragment {
         LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(coverSize, coverSize);
         cover.setLayoutParams(clp);
         cover.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        cover.setBackground(rounded(0xFF2A2E37, 10));
+        cover.setBackground(rounded(cardBg(), 10));
         if (p.cover != null && !p.cover.isEmpty()) {
             Glide.with(this).load(p.cover).into(cover);
         } else {
@@ -155,7 +162,7 @@ public class MusicHomeFragment extends Fragment {
             TextView ph = new TextView(getContext());
             ph.setText(p.name.length() > 0 ? p.name.substring(0, Math.min(2, p.name.length())) : "♪");
             ph.setTextSize(20);
-            ph.setTextColor(0xFF8A8F99);
+            ph.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFF8A8F99 : 0xFF9A9FA8);
             ph.setGravity(Gravity.CENTER);
             cover.addView(ph, new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -164,7 +171,7 @@ public class MusicHomeFragment extends Fragment {
         TextView name = new TextView(getContext());
         name.setText(p.name);
         name.setTextSize(12);
-        name.setTextColor(0xFFFFFFFF);
+        name.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFFFFFFFF : 0xFF1C1C1E);
         name.setMaxLines(2);
         name.setEllipsize(android.text.TextUtils.TruncateAt.END);
         card.addView(name);
@@ -193,7 +200,7 @@ public class MusicHomeFragment extends Fragment {
         TextView num = new TextView(getContext());
         num.setText("▶");
         num.setTextSize(13);
-        num.setTextColor(0xFF3B82F6);
+        num.setTextColor(MusicEngine.platformColor(MusicEngine.getPlatform(getContext())));
         num.setPadding(0, 0, dp(10), 0);
         row.addView(num);
 
@@ -205,13 +212,13 @@ public class MusicHomeFragment extends Fragment {
         TextView name = new TextView(getContext());
         name.setText(s.name);
         name.setTextSize(14);
-        name.setTextColor(0xFFFFFFFF);
+        name.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFFFFFFFF : 0xFF1C1C1E);
         meta.addView(name);
 
         TextView singer = new TextView(getContext());
         singer.setText(s.singer);
         singer.setTextSize(12);
-        singer.setTextColor(0xFF8A8F99);
+        singer.setTextColor(MusicEngine.isDarkTheme(getContext()) ? 0xFF8A8F99 : 0xFF9A9FA8);
         meta.addView(singer);
 
         row.setOnClickListener(v -> {
@@ -231,7 +238,7 @@ public class MusicHomeFragment extends Fragment {
         String current = MusicEngine.getPlatform(getContext());
         LinearLayout menu = new LinearLayout(getContext());
         menu.setOrientation(LinearLayout.VERTICAL);
-        menu.setBackground(rounded(0xFF2A2E37, 20));
+        menu.setBackground(rounded(cardBg(), 20));
         menu.setPadding(dp(8), dp(8), dp(8), dp(8));
         final PopupWindow popup = new PopupWindow(menu,
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -244,7 +251,7 @@ public class MusicHomeFragment extends Fragment {
             tv.setPadding(dp(24), dp(18), dp(24), dp(18));
             boolean sel = plats[i].equals(current);
             tv.setTextColor(sel ? 0xFFFFFFFF : 0xFF8A8F99);
-            tv.setBackground(rounded(sel ? 0xFF3B82F6 : 0xFF3A3F4A, 14));
+            tv.setBackground(rounded(sel ? MusicEngine.platformColor(plats[idx]) : 0xFF3A3F4A, 14));
             final int idx = i;
             tv.setOnClickListener(v -> {
                 MusicEngine.setPlatform(getContext(), plats[idx]);
