@@ -65,6 +65,9 @@ public class MusicHomeFragment extends Fragment {
         menu.setBackground(rounded(0xFF2A2E37, 20));
         menu.setPadding(8, 8, 8, 8);
 
+        final PopupWindow popup = new PopupWindow(menu,
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+
         String[] platforms = MusicEngine.platforms();
         String[] names = MusicEngine.platformNames();
         for (int i = 0; i < platforms.length; i++) {
@@ -83,14 +86,12 @@ public class MusicHomeFragment extends Fragment {
             tv.setOnClickListener(v -> {
                 MusicEngine.setPlatform(getContext(), platforms[idx]);
                 updatePlatformBtn();
-                menu.dismiss();
+                popup.dismiss();
                 loadHome(); // 切换平台刷新榜单
             });
             menu.addView(tv);
         }
 
-        PopupWindow popup = new PopupWindow(menu,
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popup.setOutsideTouchable(true);
         popup.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
         popup.setElevation(24);
