@@ -336,7 +336,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         mBinding.sideNavOverlay.setVisibility(View.VISIBLE);
         mBinding.sideNav.setVisibility(View.VISIBLE);
         applyFrostedGlass();
-        mBinding.sideNav.setTranslationX(sideNavWidth);
+        mBinding.sideNav.setTranslationX(-sideNavWidth); // 靠左：从左边滑入
         mBinding.sideNav.animate().translationX(0).setDuration(220).start();
     }
 
@@ -350,7 +350,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             int screenH = ResUtil.getScreenHeight(this);
             int w = sideNavWidth;
             int h = screenH / 2;
-            int left = screenW - w;
+            int left = 0; // 靠左：面板在屏幕左侧
             int top = ResUtil.dp2px(60); // 面板距顶 60dp（与布局 marginTop 一致）
             android.graphics.Bitmap src = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888);
             android.graphics.Canvas canvas = new android.graphics.Canvas(src);
@@ -375,7 +375,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     private void hideSideNav() {
         if (!sideNavVisible) return;
         sideNavVisible = false;
-        mBinding.sideNav.animate().translationX(sideNavWidth).setDuration(200).withEndAction(() -> {
+        mBinding.sideNav.animate().translationX(-sideNavWidth).setDuration(200).withEndAction(() -> {
             mBinding.sideNav.setVisibility(View.GONE);
             mBinding.sideNavOverlay.setVisibility(View.GONE);
         }).start();
