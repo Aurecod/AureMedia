@@ -118,7 +118,10 @@ public class LiveConfig extends BaseConfig {
 
     @Override
     protected Config defaultConfig() {
-        return Config.live();
+        // ★ 默认跟随点播源（对标 AVBox live_follow_vod 默认开启）：
+        // 没有独立直播订阅时，直接用点播当前订阅解析 lives，无需用户再配一次地址。
+        Config live = Config.live();
+        return live.isEmpty() ? Config.vod() : live;
     }
 
     @Override
@@ -129,6 +132,9 @@ public class LiveConfig extends BaseConfig {
 
     @Override
     protected void load(Config config) throws Throwable {
+        // ★ sync 判定（直播 url == 点播 url = 跟随点播）不依赖调用方是否走 config()，
+        // 这样 defaultConfig() 回退点播订阅的路径也能正确标记。
+        if (!config.isEmpty()) this.sync = config.getUrl().equals(VodConfig.getUrl());
         if (config.isEmpty()) {
             initLive(config, new JsonObject());
             return;

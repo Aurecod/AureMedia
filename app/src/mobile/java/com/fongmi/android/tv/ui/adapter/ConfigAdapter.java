@@ -22,6 +22,7 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     private boolean readOnly;
     private boolean protectCurrent;
     private boolean followVod;
+    private Config followItem;
     private Config current;
 
     public ConfigAdapter(OnClickListener listener) {
@@ -56,17 +57,26 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     public ConfigAdapter addAll(int type, Config current) {
         this.current = current;
         mItems = type == 0 ? InterfaceOrderStore.sortVodConfigs(Config.getAll(type)) : Config.getAll(type);
-        // 直播源列表第 0 项："跟随点播源"（直播 URL = 点播 URL，加载点播订阅里的 lives）
+        // 清理历史脏记录（旧版本曾把"跟随点播源"insert 进数据库）
+        if (type == 1) mItems.removeIf(item -> TextUtils.equals(item.getName(), "跟随点播源"));
+        // 直播源列表第 0 项："跟随点播源"（直播 URL = 点播 URL，加载点播订阅里的 lives）。
+        // 对标 webhtv `LiveConfig.sync`（url == VodConfig.getUrl()）+ AVBox 直播源列表首项。
+        // ★ 必须是纯内存对象：不能 insert()，否则会往数据库写脏记录（且下次 getAll 已含该 url，导致首项消失）。
         followVod = false;
         if (type == 1) {
             String vodUrl = VodConfig.getUrl();
             if (!TextUtils.isEmpty(vodUrl) && !hasUrl(mItems, vodUrl)) {
-                mItems.add(0, Config.create(1, vodUrl, "跟随点播源"));
+                mItems.add(0, new Config().type(1).url(vodUrl).name("跟随点播源"));
                 followVod = true;
             }
         }
+        // 虚拟项不参与 removeIf（避免直播当前 url 已等于点播 url 时被一并删掉）
+        Config follow = followItem = followVod ? mItems.get(0) : null;
         String currentUrl = current == null ? null : current.getUrl();
-        if (!readOnly && !protectCurrent && !TextUtils.isEmpty(currentUrl)) mItems.removeIf(item -> TextUtils.equals(item.getUrl(), currentUrl));
+        if (!readOnly && !protectCurrent && !TextUtils.isEmpty(currentUrl)) {
+            mItems.removeIf(item -> item != follow && TextUtils.equals(item.getUrl(), currentUrl));
+        }
+        if (follow != null) mItems.add(0, follow);
         return this;
     }
 
@@ -80,6 +90,8 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     }
 
     private boolean isCurrent(Config item) {
+        // "跟随点播源"是虚拟项（无 id）：直播当前订阅已等于点播订阅即视为当前
+        if (item == followItem && current != null) return TextUtils.equals(current.getUrl(), item.getUrl());
         if (!protectCurrent || current == null) return false;
         if (current.getId() > 0 && item.getId() == current.getId()) return true;
         return current.getType() == item.getType()
