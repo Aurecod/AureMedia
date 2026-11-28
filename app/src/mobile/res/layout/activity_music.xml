@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#12141A">
+
+    <!-- 内容区（fragment 容器） -->
+    <FrameLayout
+        android:id="@+id/musicContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- 迷你播放条（底部，默认隐藏） -->
+    <LinearLayout
+        android:id="@+id/musicMini"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp"
+        android:background="#1A1D26"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/musicMiniCover"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_media_play"
+            android:contentDescription="封面" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:id="@+id/musicMiniTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:text="歌曲名" />
+
+            <TextView
+                android:id="@+id/musicMiniSinger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="12sp"
+                android:textColor="#8A8F99"
+                android:text="歌手" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/musicMiniPlay"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_media_play"
+            android:contentDescription="播放/暂停" />
+    </LinearLayout>
+
+    <!-- 底部 4 tab 导航 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:background="#1A1D26">
+
+        <TextView
+            android:id="@+id/musicTabHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="主页"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/musicTabLib"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="资料库"
+            android:textSize="14sp"
+            android:textColor="#8A8F99" />
+
+        <TextView
+            android:id="@+id/musicTabSearch"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="搜索"
+            android:textSize="14sp"
+            android:textColor="#8A8F99" />
+
+        <TextView
+            android:id="@+id/musicTabSetting"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="设置"
+            android:textSize="14sp"
+            android:textColor="#8A8F99" />
+    </LinearLayout>
+</LinearLayout>

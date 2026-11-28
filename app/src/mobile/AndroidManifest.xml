@@ -77,6 +77,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".music.MusicActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
         <activity-alias
             android:name=".ui.activity.HomeActivityCurrent"
             android:enabled="true"

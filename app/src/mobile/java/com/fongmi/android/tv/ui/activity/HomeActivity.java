@@ -3,6 +3,8 @@ package com.fongmi.android.tv.ui.activity;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Intent;
+
+import com.fongmi.android.tv.music.MusicActivity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -321,9 +323,12 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
         if (section == 0) {
             // 视频（点播）= 当前 App 主页
             if (currentPosition != 0) change(0);
+        } else if (section == 1) {
+            // 音乐模块
+            startActivity(new Intent(this, MusicActivity.class));
         } else {
-            // 音乐/阅读 待开发
-            Notify.show(section == 1 ? "「音乐」版块待开发" : "「阅读」版块待开发");
+            // 阅读 待开发
+            Notify.show("「阅读」版块待开发");
         }
         hideSideNav();
     }
